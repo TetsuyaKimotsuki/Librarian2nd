@@ -19,7 +19,7 @@
 | password   | string | ○    | 8～64文字、英数字記号混在可     | パスワード          |
 
 #### リクエスト例
-```json
+```yaml
 GET /api/auth/login
 {
   "email": "user@example.com",
@@ -67,7 +67,7 @@ Authorization: Bearer [JWTトークン]
 なし
 
 #### リクエスト例
-```json
+```yaml
 GET /api/auth/me
 Authorization: Bearer xxxxx.yyyyy.zzzzz
 ```
