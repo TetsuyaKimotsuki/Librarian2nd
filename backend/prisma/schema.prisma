@@ -16,4 +16,20 @@ model User {
   name      String
   role      String
   updatedAt DateTime @updatedAt
+
+  books     Book[]   @relation("UserBooks")
+}
+
+model Book {
+  id           String   @id @default(uuid())
+  title        String
+  author       String
+  isbn         String?
+  location     String?
+  memo         String?
+  purchasedAt  DateTime?
+  registeredBy String
+  updatedAt    DateTime @updatedAt
+
+  user         User     @relation("UserBooks", fields: [registeredBy], references: [email])
 }

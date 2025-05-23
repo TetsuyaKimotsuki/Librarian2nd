@@ -81,7 +81,7 @@ Authorization: Bearer xxxxx.yyyyy.zzzzz
 ```
 
 #### レスポンス（失敗時）
-- 共通エラーハンドリング仕様を参照 (401)
+- 共通エラーハンドリング仕様を参照 ([401](#401-unauthorized))
 
 #### 備考
 - JWTトークンの有効性を検証するために使用できます
@@ -133,7 +133,7 @@ Authorization: Bearer xxxxx.yyyyy.zzzzz
 ```
 
 #### レスポンス（失敗時）
-- 共通エラーハンドリング仕様を参照 (401)
+- 共通エラーハンドリング仕様を参照（[401](#401-unauthorized)）
 
 #### 備考
 - 認証必須（JWTトークン）

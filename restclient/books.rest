@@ -1,0 +1,67 @@
+@url = http://localhost:3000/api
+@email = hanako.suzuki@ogis-ri.co.jp
+@password = hanako123
+
+### ログイン
+# @name loginResponse
+POST {{url}}/auth/login
+Content-Type: application/json
+
+{ "email": "{{email}}", "password": "{{password}}"}
+
+### 成功時のJWTトークン取得
+@token = {{loginResponse.response.body.token}}
+
+
+### 書籍一覧取得
+GET {{url}}/books
+Authorization: Bearer {{token}}
+
+
+
+
+### 書籍登録
+# @name createResponse
+POST {{url}}/books
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "title": "新しいテスト書籍",
+  "author": "テスト著者",
+  "location": "テスト棚",
+  "isbn": "978-1234567891",
+  "publisher": "テスト出版社",
+  "purchaseDate": "2024-01-01",
+  "price": 2000,
+  "notes": "テスト用の書籍です"
+}
+
+@bookId = {{createResponse.response.body.id}}
+
+### 書籍詳細取得 (IDを指定)
+# @name getBookByIdResponse
+GET {{url}}/books/{{bookId}}
+Authorization: Bearer {{token}}
+
+### 書籍編集 (IDを指定)
+PUT {{url}}/books/{{bookId}}
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "title": "編集済みテスト書籍",
+  "author": "編集済み著者",
+  "location": "編集済み棚",
+  "isbn": "978-0987654321",
+  "publisher": "編集済み出版社",
+  "purchaseDate": "2024-02-01",
+  "price": 2500,
+  "notes": "編集済みのテスト書籍です"
+}
+
+### 書籍削除 (IDを指定)
+DELETE {{url}}/books/{{bookId}}
+Authorization: Bearer {{token}}
+
+

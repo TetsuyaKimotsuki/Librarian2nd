@@ -8,6 +8,21 @@ const validUser = {
     name: '鈴木 花子'
 }
 
+// JWT取得用のヘルパー
+async function getToken() {
+    const req = new Request('http://localhost/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            email: validUser.email,
+            password: validUser.password
+        })
+    })
+    const res = await app.fetch(req)
+    const body = await res.json()
+    return body.token
+}
+
 describe('POST /api/auth/login', () => {
     it.each([
         { name: 'emailが未指定の場合は400を返す', body: { password: validUser.password } },
@@ -65,6 +80,40 @@ describe('POST /api/auth/login', () => {
         const body = await res.json()
         expect(body).toHaveProperty('token')
         expect(body.user).toMatchObject({
+            email: validUser.email,
+            name: validUser.name
+        })
+    })
+})
+
+describe('GET /api/auth/me', () => {
+    it('認証ヘッダがない場合は401を返す', async () => {
+        const req = new Request('http://localhost/api/auth/me', {
+            method: 'GET'
+        })
+        const res = await app.fetch(req)
+        expect(res.status).toBe(401)
+    })
+
+    it('不正なトークンの場合は401を返す', async () => {
+        const req = new Request('http://localhost/api/auth/me', {
+            method: 'GET',
+            headers: { 'Authorization': 'Bearer invalidtoken' }
+        })
+        const res = await app.fetch(req)
+        expect(res.status).toBe(401)
+    })
+
+    it('正しいトークンの場合はユーザー情報を返す', async () => {
+        const token = await getToken()
+        const req = new Request('http://localhost/api/auth/me', {
+            method: 'GET',
+            headers: { 'Authorization': `Bearer ${token}` }
+        })
+        const res = await app.fetch(req)
+        expect(res.status).toBe(200)
+        const body = await res.json()
+        expect(body).toMatchObject({
             email: validUser.email,
             name: validUser.name
         })
