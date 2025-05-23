@@ -1,0 +1,20 @@
+@url = http://localhost:3000/api
+@email = hanako.suzuki@ogis-ri.co.jp
+@password = hanako123
+
+### ログイン
+# @name loginResponse
+POST {{url}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "{{email}}",
+  "password": "{{password}}"
+}
+
+### 成功時のJWTトークン取得
+@token = {{loginResponse.response.body.token}}
+
+### 認証付きAPI（テスト用）
+GET {{url}}/auth/me
+Authorization: Bearer {{token}}

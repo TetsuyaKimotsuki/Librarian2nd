@@ -1,11 +1,14 @@
 import { serve } from '@hono/node-server'
 import { Hono } from 'hono'
+import auth from './auth.js'
 
 const app = new Hono()
 
 app.get('/', (c) => {
   return c.text('Hello Node.js/Hono!')
 })
+
+app.route('/api/auth', auth)
 
 const server = serve({
   fetch: app.fetch,
