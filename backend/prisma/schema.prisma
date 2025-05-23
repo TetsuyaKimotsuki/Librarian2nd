@@ -1,0 +1,19 @@
+// Prismaスキーマ初期雛形
+// Userモデルのみ定義（今後Book等を追加）
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  email     String  @id @unique
+  password  String
+  name      String
+  role      String
+  updatedAt DateTime @updatedAt
+}
