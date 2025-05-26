@@ -2,12 +2,11 @@ import { PrismaClient } from '@prisma/client'
 import * as bcrypt from 'bcryptjs'
 import { Hono } from 'hono'
 import jwt from 'jsonwebtoken'
-import { requireFields } from './validator.js'
+import { JWT_SECRET, jwtGuardian } from "../middleware/guardian.js"
+import { requireFields } from '../tools/validator.js'
 
 const prisma = new PrismaClient()
 const auth = new Hono()
-
-const JWT_SECRET = process.env.JWT_SECRET || 'dev-1vvtCHoy7XwpLZCkVfHnM3rVRAf2ipR1cNMwCvdlBQA='
 
 // POST /api/auth/login
 // body: { email, password }
@@ -36,30 +35,20 @@ auth.post('/login', async (c) => {
 })
 
 // GET /api/auth/me
-auth.get('/me', async (c) => {
-    const authHeader = c.req.header('Authorization')
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-        return c.json({ message: '認証情報がありません' }, 401)
-    }
-    const token = authHeader.replace('Bearer ', '')
-    try {
-        const decoded = jwt.verify(token, JWT_SECRET)
-        // JWTの型を明示し、emailを安全に取得
-        const email = typeof decoded === 'object' && decoded !== null ? decoded.email : undefined
-        if (!email) {
-            return c.json({ message: '認証失敗' }, 401)
-        }
-        const user = await prisma.user.findUnique({ where: { email } })
-        if (!user) {
-            return c.json({ message: 'ユーザーが存在しません' }, 401)
-        }
-        return c.json({
-            email: user.email,
-            name: user.name
-        })
-    } catch (e) {
+// jwtGuardianでContextに型付きでuser情報を格納しているので、c.get('user')で型安全に取得
+auth.get('/me', jwtGuardian, async (c) => {
+    const userInfo = c.get('user')
+    if (!userInfo?.email) {
         return c.json({ message: '認証失敗' }, 401)
     }
+    const user = await prisma.user.findUnique({ where: { email: userInfo.email } })
+    if (!user) {
+        return c.json({ message: 'ユーザーが存在しません' }, 401)
+    }
+    return c.json({
+        email: user.email,
+        name: user.name
+    })
 })
 
 export default auth

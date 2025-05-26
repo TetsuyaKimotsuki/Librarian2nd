@@ -1,6 +1,6 @@
 import { Hono } from 'hono'
-import auth from './auth.js'
-import books from './books.js'
+import auth from './api/auth.js'
+import books from './api/books.js'
 
 export const app = new Hono()
 
