@@ -3,7 +3,7 @@ import { app } from '../src/index.js'
 
 // テスト用ユーザー情報
 const validUser = {
-    email: 'hanako.suzuki@ogis-ri.co.jp',
+    email: 'hanako.suzuki@sigo-ri.co.jp',
     password: 'hanako123',
     name: '鈴木 花子'
 }
@@ -45,7 +45,7 @@ describe('POST /api/auth/login', () => {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                email: 'notfound@ogis-ri.co.jp',
+                email: 'notfound@sigo-ri.co.jp',
                 password: 'wrong'
             })
         })

@@ -3,7 +3,7 @@ import { app } from '../src/index.js'
 
 // テスト用ユーザー情報
 const validUser = {
-    email: 'hanako.suzuki@ogis-ri.co.jp',
+    email: 'hanako.suzuki@sigo-ri.co.jp',
     password: 'hanako123',
     name: '鈴木 花子'
 }
@@ -51,8 +51,13 @@ describe('GET /api/books', () => {
         expect(res.status).toBe(200)
         const body = await res.json()
         expect(Array.isArray(body.books)).toBe(true)
-        expect(body.books.length).toBeGreaterThanOrEqual(1)
+        expect(body.books.length).toBe(30)
         expect(body.books[0]).toHaveProperty('title')
         expect(body.books[0]).toHaveProperty('author')
+        expect(body.books[0]).toHaveProperty('isbn')
+        expect(body.books[0]).toHaveProperty('location')
+        expect(body.books[0]).toHaveProperty('memo')
+        expect(body.books[0]).toHaveProperty('purchasedAt')
+        expect(body.books[0]).toHaveProperty('registeredBy')
     })
 })

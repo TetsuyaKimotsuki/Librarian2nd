@@ -8,31 +8,31 @@ const prisma = new PrismaClient();
 async function main() {
     const users = [
         {
-            email: 'taro.yamada@ogis-ri.co.jp',
+            email: 'taro.yamada@sigo-ri.co.jp',
             password: await bcrypt.hash('taro123', 10),
             name: '山田 太郎',
             role: 'admin',
         },
         {
-            email: 'hanako.suzuki@ogis-ri.co.jp',
+            email: 'hanako.suzuki@sigo-ri.co.jp',
             password: await bcrypt.hash('hanako123', 10),
             name: '鈴木 花子',
             role: 'user',
         },
         {
-            email: 'ichiro.sato@ogis-ri.co.jp',
+            email: 'ichiro.sato@sigo-ri.co.jp',
             password: await bcrypt.hash('ichiro123', 10),
             name: '佐藤 一郎',
             role: 'user',
         },
         {
-            email: 'yuko.tanaka@ogis-ri.co.jp',
+            email: 'yuko.tanaka@sigo-ri.co.jp',
             password: await bcrypt.hash('yuko123', 10),
             name: '田中 優子',
             role: 'user',
         },
         {
-            email: 'kenji.kobayashi@ogis-ri.co.jp',
+            email: 'kenji.kobayashi@sigo-ri.co.jp',
             password: await bcrypt.hash('kenji123', 10),
             name: '小林 健二',
             role: 'user',
@@ -57,7 +57,7 @@ async function main() {
         location: '3F 技術書棚',
         memo: '2024年度新刊\n技術書',
         purchasedAt: new Date('2024-04-01'),
-        registeredBy: 'taro.yamada@ogis-ri.co.jp',
+        registeredBy: 'taro.yamada@sigo-ri.co.jp',
       },
       {
         title: 'リーダブルコード',
@@ -66,7 +66,7 @@ async function main() {
         location: '3F 技術書棚',
         memo: '2025年度再購入',
         purchasedAt: new Date('2025-03-15'),
-        registeredBy: 'hanako.suzuki@ogis-ri.co.jp',
+        registeredBy: 'hanako.suzuki@sigo-ri.co.jp',
       },
       // 同著者の別書籍
       {
@@ -76,7 +76,7 @@ async function main() {
         location: '3F 技術書棚',
         memo: 'TDDのバイブル',
         purchasedAt: new Date('2023-12-10'),
-        registeredBy: 'ichiro.sato@ogis-ri.co.jp',
+        registeredBy: 'ichiro.sato@sigo-ri.co.jp',
       },
       {
         title: 'エクストリームプログラミング',
@@ -85,7 +85,7 @@ async function main() {
         location: '3F 技術書棚',
         memo: '',
         purchasedAt: new Date('2022-11-05'),
-        registeredBy: 'kenji.kobayashi@ogis-ri.co.jp',
+        registeredBy: 'kenji.kobayashi@sigo-ri.co.jp',
       },
       // 著者バリエーション
       {
@@ -95,7 +95,7 @@ async function main() {
         location: '3F DB棚',
         memo: '',
         purchasedAt: new Date('2023-08-01'),
-        registeredBy: 'yuko.tanaka@ogis-ri.co.jp',
+        registeredBy: 'yuko.tanaka@sigo-ri.co.jp',
       },
       {
         title: 'Web API: The Good Parts',
@@ -104,7 +104,7 @@ async function main() {
         location: '3F Web棚',
         memo: '',
         purchasedAt: new Date('2024-01-20'),
-        registeredBy: 'taro.yamada@ogis-ri.co.jp',
+        registeredBy: 'taro.yamada@sigo-ri.co.jp',
       },
       // ...（ここにさらに25冊分、著者・タイトル・登録者・購入日等をバリエーション豊かに追加）
     ]
