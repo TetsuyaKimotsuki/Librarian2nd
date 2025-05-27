@@ -89,10 +89,10 @@ Authorization: Bearer xxxxx.yyyyy.zzzzz
 
 ---
 
-## GET /api/books
+## GET /api/books/all
 
 #### 概要
-書籍一覧を取得する。将来的には検索・絞り込み・ページング等にも対応予定。
+書籍一覧を無条件に全件取得する。
 
 #### リクエストヘッダ
 Authorization: Bearer [JWTトークン]
@@ -101,14 +101,14 @@ Authorization: Bearer [JWTトークン]
 なし
 
 #### クエリパラメータ
-なし（将来的に検索条件やページング用パラメータを追加予定）
+なし
 
 #### リクエストボディ
 なし
 
 #### リクエスト例
 ```yaml
-GET /api/books
+GET /api/books/all
 Authorization: Bearer xxxxx.yyyyy.zzzzz
 ```
 
@@ -137,8 +137,6 @@ Authorization: Bearer xxxxx.yyyyy.zzzzz
 
 #### 備考
 - 認証必須（JWTトークン）
-- 返却件数が多い場合は将来的にページング対応予定
-- 検索・絞り込み条件は今後拡張予定
 ---
 
 ## 共通エラーハンドリング

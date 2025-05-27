@@ -23,9 +23,9 @@ async function getToken() {
     return body.token
 }
 
-describe('GET /api/books', () => {
+describe('GET /api/books/all', () => {
     it('認証ヘッダがない場合は401を返す', async () => {
-        const req = new Request('http://localhost/api/books', {
+        const req = new Request('http://localhost/api/books/all', {
             method: 'GET'
         })
         const res = await app.fetch(req)
@@ -33,7 +33,7 @@ describe('GET /api/books', () => {
     })
 
     it('不正なトークンの場合は401を返す', async () => {
-        const req = new Request('http://localhost/api/books', {
+        const req = new Request('http://localhost/api/books/all', {
             method: 'GET',
             headers: { 'Authorization': 'Bearer invalidtoken' }
         })
@@ -43,7 +43,7 @@ describe('GET /api/books', () => {
 
     it('正しいトークンの場合は書籍一覧を返す', async () => {
         const token = await getToken()
-        const req = new Request('http://localhost/api/books', {
+        const req = new Request('http://localhost/api/books/all', {
             method: 'GET',
             headers: { 'Authorization': `Bearer ${token}` }
         })

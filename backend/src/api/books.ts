@@ -6,8 +6,8 @@ const prisma = new PrismaClient()
 const books = new Hono()
 books.use('*', jwtGuardian)
 
-// GET /api/books
-books.get('/', async (c) => {
+// GET /api/books/all
+books.get('/all', async (c) => {
     // 認証済みユーザー情報はc.get('user')で取得可能
     // 書籍一覧取得
     const booksList = await prisma.book.findMany({
