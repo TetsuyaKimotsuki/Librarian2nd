@@ -1,5 +1,5 @@
 @url = http://localhost:3000/api
-@email = hanako.suzuki@ogis-ri.co.jp
+@email = hanako.suzuki@sigo-ri.co.jp
 @password = hanako123
 
 ### ログイン

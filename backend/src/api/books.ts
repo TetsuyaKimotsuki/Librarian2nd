@@ -43,7 +43,10 @@ books.get('/', async (c) => {
                             { title: { contains: keyword } },
                             { author: { contains: keyword } },
                             { memo: { contains: keyword } },
+                            // registeredBy（email）部分一致
                             { registeredBy: { contains: keyword } },
+                            // User.name部分一致（リレーション検索）
+                            { user: { name: { contains: keyword } } },
                         ],
                     }
                     : undefined,

@@ -70,7 +70,7 @@ describe('GET /api/books', () => {
 
     // --- 正常系 ---
     it('キーワード検索（keywordパラメータ）で部分一致する書籍のみ返す', async () => {
-        const req = new Request('http://localhost/api/books?keyword=リーダブル', {
+        const req = new Request('http://localhost/api/books?keyword=山田', {
             method: 'GET',
             headers: { 'Authorization': `Bearer ${token}` }
         })
@@ -81,10 +81,10 @@ describe('GET /api/books', () => {
         expect(body.books.length).toBeGreaterThan(0)
         for (const book of body.books) {
             expect(
-                book.title.includes('リーダブル') ||
-                book.author.includes('リーダブル') ||
-                book.memo.includes('リーダブル') ||
-                book.registeredBy.includes('リーダブル')
+                book.title.includes('山田') ||
+                book.author.includes('山田') ||
+                book.memo.includes('山田') ||
+                book.registeredBy === 'taro.yamada@sigo-ri.co.jp' // registeredByから「山田 太郎」を引ける場合はこうなるはず
             ).toBe(true)
         }
     })

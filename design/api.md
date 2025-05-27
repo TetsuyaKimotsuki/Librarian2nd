@@ -39,7 +39,7 @@ GET /api/auth/login
 ```
 
 #### レスポンス（失敗時）
-- 共通エラーハンドリング仕様を参照 (400)
+- 共通エラーハンドリング仕様を参照 ([400](#400-bad-request))
 
 #### 備考
 - ハッシュ化して保存されたパスワードと突き合わせます
@@ -185,21 +185,19 @@ Authorization: Bearer xxxxx.yyyyy.zzzzz
     }
     // ...
   ],
-  "total": 100,
-  "page": 1,
-  "per_page": 10
+  "total": 100, // 検索結果の総件数
+  "page": 1, // 取得したページ番号
+  "per_page": 10 // ページに含まれる件数
 }
 ```
 
 #### レスポンス（失敗時）
-- 共通エラーハンドリング仕様を参照（[401](#401-unauthorized)）
+- 共通エラーハンドリング仕様を参照（[400](#400-bad-request), [401](#401-unauthorized)）
 - purchased_from > purchased_to の場合は 400 Bad Request を返却し、`message` フィールドで理由を返す
 
 #### 備考
 - 認証必須（JWTトークン）
 - purchasedAtの降順で並びます
-- purchased_fromのデフォルト値は 2000-01-01
-- purchased_toのデフォルト値は 2099-12-31
 
 ---
 

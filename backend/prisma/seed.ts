@@ -104,9 +104,8 @@ async function main() {
         location: '3F Web棚',
         memo: '購入日不明',
         // purchasedAt: new Date('2024-01-20'), default値 2000-01-01 が入る
-        registeredBy: 'taro.yamada@sigo-ri.co.jp',
+        registeredBy: 'yuko.tanaka@sigo-ri.co.jp',
       },
-      // ...（ここにさらに25冊分、著者・タイトル・登録者・購入日等をバリエーション豊かに追加）
     ]
 
     // ダミーデータを30冊まで拡張
