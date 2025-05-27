@@ -193,6 +193,7 @@ Authorization: Bearer xxxxx.yyyyy.zzzzz
 
 #### レスポンス（失敗時）
 - 共通エラーハンドリング仕様を参照（[401](#401-unauthorized)）
+- purchased_from > purchased_to の場合は 400 Bad Request を返却し、`message` フィールドで理由を返す
 
 #### 備考
 - 認証必須（JWTトークン）
