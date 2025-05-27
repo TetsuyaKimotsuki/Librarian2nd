@@ -137,6 +137,69 @@ Authorization: Bearer xxxxx.yyyyy.zzzzz
 
 #### 備考
 - 認証必須（JWTトークン）
+
+---
+
+## GET /api/books
+
+#### 概要
+検索条件にヒットする書籍一覧を取得する。
+ページ番号と、ページサイズの指定により、ページネーションが可能。
+
+#### リクエストヘッダ
+Authorization: Bearer [JWTトークン]
+
+#### パスパラメータ
+なし
+
+#### クエリパラメータ
+- keyword: キーワード検索（タイトル、著者名、備考、購入者のemail/nameへの部分一致）
+- purchased_from: 購入日の開始日（YYYY-MM-DD形式、デフォルト: 2000-01-01）
+- purchased_to: 購入日の終了日（YYYY-MM-DD形式、デフォルト: 2099-12-31）
+- page: ページ番号（デフォルトは1）
+- per_page: 1ページあたりの表示件数（デフォルトは10）
+
+#### リクエストボディ
+なし
+
+#### リクエスト例
+```yaml
+GET /api/books?keyword=リーダブル&purchased_from=2024-01-01&purchased_to=2024-12-31&page=1&per_page=10
+Authorization: Bearer xxxxx.yyyyy.zzzzz
+```
+
+#### レスポンス（成功時）
+```json
+{
+  "books": [
+    {
+      "id": "b1a2c3d4-...",
+      "title": "リーダブルコード",
+      "author": "ダスティン・ボズウェル",
+      "isbn": "978-4873115658",
+      "location": "3F 技術書棚",
+      "memo": "2024年度新刊\n技術書",
+      "purchasedAt": "2024-04-01",
+      "registeredBy": "user1@example.com",
+      "updatedAt": "2024-05-22T10:00:00Z"
+    }
+    // ...
+  ],
+  "total": 100,
+  "page": 1,
+  "per_page": 10
+}
+```
+
+#### レスポンス（失敗時）
+- 共通エラーハンドリング仕様を参照（[401](#401-unauthorized)）
+
+#### 備考
+- 認証必須（JWTトークン）
+- purchasedAtの降順で並びます
+- purchased_fromのデフォルト値は 2000-01-01
+- purchased_toのデフォルト値は 2099-12-31
+
 ---
 
 ## 共通エラーハンドリング
