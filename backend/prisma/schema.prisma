@@ -1,5 +1,4 @@
-// Prismaスキーマ初期雛形
-// Userモデルのみ定義（今後Book等を追加）
+// Prismaスキーマ
 
 datasource db {
   provider = "postgresql"
@@ -27,7 +26,7 @@ model Book {
   isbn         String?
   location     String?
   memo         String?
-  purchasedAt  DateTime?
+  purchasedAt  DateTime? @default("2000-01-01T00:00:00Z")
   registeredBy String
   updatedAt    DateTime @updatedAt
 
