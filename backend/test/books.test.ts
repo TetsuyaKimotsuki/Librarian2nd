@@ -377,3 +377,176 @@ describe('POST /api/books', () => {
         }
     })
 })
+
+describe('PUT /api/books/{bookId}', () => {
+    let token: string
+    let bookId: string
+    const initialBook = {
+        title: '編集前タイトル',
+        author: '編集前著者',
+        isbn: '123-4567890123',
+        location: '編集前棚',
+        memo: '編集前メモ',
+        purchasedAt: '2024-05-01'
+    }
+    beforeAll(async () => {
+        token = await getToken()
+        // 事前に1件登録しておく
+        const req = new Request('http://localhost/api/books', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(initialBook)
+        })
+        const res = await app.fetch(req)
+        const body = await res.json()
+        bookId = body.book.id
+    })
+    afterAll(async () => {
+        // テストで作成した書籍を削除
+        try {
+            await prisma.book.delete({ where: { id: bookId } })
+        } catch (e) {}
+    })
+
+    // PUT /api/books/{bookId}用の共通リクエスト生成関数
+    function makePutBookRequest(token: string, bookId: string, body: any) {
+        return new Request(`http://localhost/api/books/${bookId}`, {
+            method: 'PUT',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(body)
+        })
+    }
+
+    // --- 正常系 ---
+    it('全項目を更新できる', async () => {
+        const update = {
+            title: '編集後タイトル',
+            author: '編集後著者',
+            isbn: '987-6543210987',
+            location: '編集後棚',
+            memo: '編集後メモ',
+            purchasedAt: '2025-05-28'
+        }
+        const req = makePutBookRequest(token, bookId, update)
+        const res = await app.fetch(req)
+        expect(res.status).toBe(200)
+        const body = await res.json()
+        expect(body.book.title).toBe(update.title)
+        expect(body.book.author).toBe(update.author)
+        expect(body.book.isbn).toBe(update.isbn)
+        expect(body.book.location).toBe(update.location)
+        expect(body.book.memo).toBe(update.memo)
+        expect(body.book.purchasedAt).toBe(update.purchasedAt)
+        expect(body.book.registeredBy).toBe(validUser.email)
+        expect(body.book).toHaveProperty('updatedAt')
+    })
+
+    it('必須項目のみで更新できる', async () => {
+        const update = {
+            title: '必須のみ編集',
+            author: '必須のみ著者'
+        }
+        const req = makePutBookRequest(token, bookId, update)
+        const res = await app.fetch(req)
+        expect(res.status).toBe(200)
+        const body = await res.json()
+        expect(body.book.title).toBe(update.title)
+        expect(body.book.author).toBe(update.author)
+        expect(body.book.purchasedAt).toBe('2000-01-01')
+    })
+
+    it('isbnに数字のみ/数字+ハイフンで更新できる', async () => {
+        const validIsbns = ['9781234567890', '978-1-2345-6789-0']
+        for (const isbn of validIsbns) {
+            const req = makePutBookRequest(token, bookId, {
+                title: 'isbn編集',
+                author: '著者',
+                isbn
+            })
+            const res = await app.fetch(req)
+            expect(res.status).toBe(200)
+            const body = await res.json()
+            expect(body.book.isbn).toBe(isbn)
+        }
+    })
+
+    it('memoに改行や長文を指定して更新できる', async () => {
+        const longMemo = 'b'.repeat(1000) + '\n編集メモ'
+        const req = makePutBookRequest(token, bookId, {
+            title: 'memo編集',
+            author: '著者',
+            memo: longMemo
+        })
+        const res = await app.fetch(req)
+        expect(res.status).toBe(200)
+        const body = await res.json()
+        expect(body.book.memo).toBe(longMemo)
+    })
+
+    // --- 異常系 ---
+    const invalidCases = [
+        { name: '存在しないbookId', id: '00000000-0000-0000-0000-000000000000', body: { title: 'a', author: 'a' }, status: 404, msg: 'Not Found' },
+        { name: 'title未指定', id: null, body: { author: 'a' }, status: 400, msg: 'title' },
+        { name: 'author未指定', id: null, body: { title: 'a' }, status: 400, msg: 'author' },
+        { name: 'titleが空文字', id: null, body: { title: '', author: 'a' }, status: 400, msg: 'title' },
+        { name: 'authorが空文字', id: null, body: { title: 'a', author: '' }, status: 400, msg: 'author' },
+        { name: 'titleが256文字以上', id: null, body: { title: 'a'.repeat(256), author: 'a' }, status: 400, msg: 'title' },
+        { name: 'authorが256文字以上', id: null, body: { title: 'a', author: 'a'.repeat(256) }, status: 400, msg: 'author' },
+        { name: 'isbnに数字・ハイフン以外が含まれる', id: null, body: { title: 'a', author: 'a', isbn: '978-abc-123' }, status: 400, msg: 'isbn' },
+        { name: 'locationが256文字以上', id: null, body: { title: 'a', author: 'a', location: 'a'.repeat(256) }, status: 400, msg: 'location' },
+        { name: 'purchasedAtがYYYY-MM-DD形式でない', id: null, body: { title: 'a', author: 'a', purchasedAt: '20240527' }, status: 400, msg: 'purchasedAt' },
+        { name: 'purchasedAtが不正な日付', id: null, body: { title: 'a', author: 'a', purchasedAt: '2024-02-30' }, status: 400, msg: 'purchasedAt' },
+    ]
+    it.each(invalidCases)('$name', async ({ id, body, status, msg }) => {
+        const targetId = id || bookId
+        const req = makePutBookRequest(token, targetId, body)
+        const res = await app.fetch(req)
+        expect(res.status).toBe(status)
+        const resBody = await res.json()
+        expect(JSON.stringify(resBody.message)).toContain(msg)
+    })
+
+    // --- その他 ---
+    it('registeredByは変更不可（リクエストで指定しても無視される）', async () => {
+        const req = makePutBookRequest(token, bookId, {
+            title: 'registeredBy編集',
+            author: '著者',
+            registeredBy: 'malicious@example.com'
+        })
+        const res = await app.fetch(req)
+        expect(res.status).toBe(200)
+        const body = await res.json()
+        expect(body.book.registeredBy).toBe(validUser.email)
+    })
+
+    it('更新後、DBの内容が正しく書き換わっている', async () => {
+        const update = {
+            title: 'DB反映テスト',
+            author: 'DB反映著者',
+            isbn: '111-2222222222',
+            location: 'DB棚',
+            memo: 'DBメモ',
+            purchasedAt: '2025-05-28'
+        }
+        const req = makePutBookRequest(token, bookId, update)
+        const res = await app.fetch(req)
+        expect(res.status).toBe(200)
+        // DBから直接取得して検証
+        const dbBook = await prisma.book.findUnique({ where: { id: bookId } })
+        expect(dbBook).not.toBeNull()
+        if (dbBook) {
+            expect(dbBook.title).toBe(update.title)
+            expect(dbBook.author).toBe(update.author)
+            expect(dbBook.isbn).toBe(update.isbn)
+            expect(dbBook.location).toBe(update.location)
+            expect(dbBook.memo).toBe(update.memo)
+            expect(dbBook.purchasedAt?.toISOString().slice(0, 10)).toBe(update.purchasedAt)
+        }
+    })
+})

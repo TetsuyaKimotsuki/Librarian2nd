@@ -266,6 +266,72 @@ Authorization: Bearer xxxxx.yyyyy.zzzzz
 
 ---
 
+## PUT /api/books/{bookId}
+
+#### 概要
+指定した書籍IDの書籍情報を編集（更新）する。
+
+#### リクエストヘッダ
+Authorization: Bearer [JWTトークン]
+
+#### パスパラメータ
+- bookId: string（UUID形式、必須）
+
+#### クエリパラメータ
+なし
+
+#### リクエストボディ
+| パラメータ     | 型      | 必須 | 制約・バリデーション例           | 説明                |
+|----------------|---------|------|----------------------------------|---------------------|
+| title          | string  | ○    | 最大255文字                      | 書籍タイトル        |
+| author         | string  | ○    | 最大255文字                      | 著者名              |
+| isbn           | string  |      | ISBN-10またはISBN-13形式         | ISBN                |
+| location       | string  |      | 最大255文字                      | 保管場所            |
+| memo           | string  |      | 最大1000文字                     | 備考・メモ          |
+| purchasedAt    | string  |      | YYYY-MM-DD形式                   | 購入日（省略時は2000-01-01）|
+
+#### リクエスト例
+```yaml
+PUT /api/books/b1a2c3d4-...
+Authorization: Bearer xxxxx.yyyyy.zzzzz
+{
+  "title": "リーダブルコード",
+  "author": "ダスティン・ボズウェル",
+  "isbn": "978-4873115658",
+  "location": "3F 技術書棚",
+  "memo": "2024年度新刊 技術書",
+  "purchasedAt": "2024-04-01"
+}
+```
+
+#### レスポンス（成功時）
+```json
+{
+  "book": {
+    "id": "b1a2c3d4-...",
+    "title": "リーダブルコード",
+    "author": "ダスティン・ボズウェル",
+    "isbn": "978-4873115658",
+    "location": "3F 技術書棚",
+    "memo": "2024年度新刊 技術書",
+    "purchasedAt": "2024-04-01",
+    "registeredBy": "user1@example.com",
+    "updatedAt": "2025-05-28T10:00:00Z"
+  }
+}
+```
+
+#### レスポンス（失敗時）
+- 共通エラーハンドリング仕様を参照（[400](#400-bad-request), [401](#401-unauthorized)）
+- 指定したbookIdが存在しない場合は404 Not Foundを返却し、`message`フィールドで理由を返す
+
+#### 備考
+- 認証必須（JWTトークン）
+- updatedAtは自動的に現在時刻で更新される
+- registeredByは変更不可
+
+---
+
 ## 共通エラーハンドリング
 
 本API群では、以下のエラー応答を全APIで共通的に返す場合があります。

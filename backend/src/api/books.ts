@@ -131,4 +131,61 @@ books.post('/', async (c) => {
     }
 })
 
+// PUT /api/books/:bookId
+const putBookSchema = z.object({
+    title: z.string().min(1, 'titleは必須です').max(255),
+    author: z.string().min(1, 'authorは必須です').max(255),
+    isbn: z.string().regex(/^[0-9\-]+$/, 'isbnは数字とハイフンのみ').max(32).optional().or(z.literal('').transform(() => undefined)),
+    location: z.string().max(255).optional(),
+    memo: z.string().optional(),
+    purchasedAt: z.string().optional().default('2000-01-01')
+        .refine(
+            (val) => !val || /^\d{4}-\d{2}-\d{2}$/.test(val),
+            { message: 'purchasedAtはYYYY-MM-DD形式で指定してください' }
+        )
+        .refine(
+            (val) => {
+                const date = new Date(val);
+                return !isNaN(date.getTime()) && date.toISOString().slice(0, 10) === val;
+            },
+            { message: 'purchasedAtが不正な日付です' }
+        ),
+})
+books.put('/:bookId', async (c) => {
+    try {
+        const { bookId } = c.req.param()
+        const body = await c.req.json()
+        const parsed = putBookSchema.parse(body)
+        // 既存レコード存在チェック
+        const existing = await prisma.book.findUnique({ where: { id: bookId } })
+        if (!existing) {
+            return c.json({ message: 'Not Found' }, 404)
+        }
+        const updated = await prisma.book.update({
+            where: { id: bookId },
+            data: {
+                title: parsed.title,
+                author: parsed.author,
+                isbn: parsed.isbn || undefined,
+                location: parsed.location || undefined,
+                memo: parsed.memo || undefined,
+                purchasedAt: new Date(parsed.purchasedAt),
+                // registeredByは変更不可
+                updatedAt: new Date(),
+            }
+        })
+        const bookJson = {
+            ...updated,
+            purchasedAt: updated.purchasedAt?.toISOString().slice(0, 10)
+        }
+        return c.json({ book: bookJson })
+    } catch (error) {
+        if (error instanceof ZodError) {
+            const msg = error.errors.map(e => `${e.path[0]}: ${e.message}`).join(', ')
+            return c.json({ message: msg }, 400)
+        }
+        return c.json({ message: 'Internal Server Error' }, 500)
+    }
+})
+
 export default books
