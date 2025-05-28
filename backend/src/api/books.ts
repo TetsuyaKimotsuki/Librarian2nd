@@ -116,6 +116,9 @@ books.post('/', async (c) => {
 // PUT /api/books/:bookId
 books.put('/:bookId', async (c) => {
     const { bookId } = c.req.param()
+    // UUID形式バリデーションを追加
+    const uuidSchema = z.string().uuid({ message: 'bookIdはUUID形式で指定してください' })
+    uuidSchema.parse(bookId)
     const body = await c.req.json()
     const parsed = pushBookSchema.parse(body)
     const existing = await prisma.book.findUnique({ where: { id: bookId } })

@@ -24,6 +24,21 @@ async function getToken() {
     return body.token
 }
 
+// テスト用ダミー書籍を登録しIDを返す共通関数
+async function createDummyBook(token: string, book: any) {
+    const req = new Request('http://localhost/api/books', {
+        method: 'POST',
+        headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(book)
+    })
+    const res = await app.fetch(req)
+    const body = await res.json()
+    return body.book.id
+}
+
 describe('GET /api/books/all', () => {
     it('認証ヘッダがない場合は401を返す', async () => {
         const req = new Request('http://localhost/api/books/all', {
@@ -391,24 +406,12 @@ describe('PUT /api/books/{bookId}', () => {
     }
     beforeAll(async () => {
         token = await getToken()
-        // 事前に1件登録しておく
-        const req = new Request('http://localhost/api/books', {
-            method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(initialBook)
-        })
-        const res = await app.fetch(req)
-        const body = await res.json()
-        bookId = body.book.id
+        bookId = await createDummyBook(token, initialBook)
     })
     afterAll(async () => {
-        // テストで作成した書籍を削除
         try {
             await prisma.book.delete({ where: { id: bookId } })
-        } catch (e) {}
+        } catch (e) { }
     })
 
     // PUT /api/books/{bookId}用の共通リクエスト生成関数
@@ -492,6 +495,7 @@ describe('PUT /api/books/{bookId}', () => {
     // --- 異常系 ---
     const invalidCases = [
         { name: '存在しないbookId', id: '00000000-0000-0000-0000-000000000000', body: { title: 'a', author: 'a' }, status: 404, msg: 'Not Found' },
+        { name: 'bookIdがUUID形式でない', id: 'invalid-id', body: { title: 'a', author: 'a' }, status: 400, msg: 'bookIdはUUID形式で指定してください' },
         { name: 'title未指定', id: null, body: { author: 'a' }, status: 400, msg: 'title' },
         { name: 'author未指定', id: null, body: { title: 'a' }, status: 400, msg: 'author' },
         { name: 'titleが空文字', id: null, body: { title: '', author: 'a' }, status: 400, msg: 'title' },
@@ -556,31 +560,19 @@ describe('GET /api/books/:bookId', () => {
     let bookId: string
     beforeAll(async () => {
         token = await getToken()
-        // 1冊登録してIDを保持
-        const req = new Request('http://localhost/api/books', {
-            method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                title: '詳細取得テスト',
-                author: 'テスト著者',
-                isbn: '123-4567890123',
-                location: '1F 棚',
-                memo: '詳細取得用',
-                purchasedAt: '2025-05-28'
-            })
+        bookId = await createDummyBook(token, {
+            title: '詳細取得テスト',
+            author: 'テスト著者',
+            isbn: '123-4567890123',
+            location: '1F 棚',
+            memo: '詳細取得用',
+            purchasedAt: '2025-05-28'
         })
-        const res = await app.fetch(req)
-        const body = await res.json()
-        bookId = body.book.id
     })
     afterAll(async () => {
-        // 登録した書籍を削除
         try {
             await prisma.book.delete({ where: { id: bookId } })
-        } catch (e) {}
+        } catch (e) { }
     })
 
     it('既存bookIdで詳細情報が取得できる', async () => {
@@ -630,25 +622,14 @@ describe('DELETE /api/books/:bookId', () => {
     let bookId: string
     beforeAll(async () => {
         token = await getToken()
-        // 1冊登録してIDを保持
-        const req = new Request('http://localhost/api/books', {
-            method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                title: '削除テスト',
-                author: '削除著者',
-                isbn: '999-9999999999',
-                location: '削除棚',
-                memo: '削除用',
-                purchasedAt: '2025-05-28'
-            })
+        bookId = await createDummyBook(token, {
+            title: '削除テスト',
+            author: '削除著者',
+            isbn: '999-9999999999',
+            location: '削除棚',
+            memo: '削除用',
+            purchasedAt: '2025-05-28'
         })
-        const res = await app.fetch(req)
-        const body = await res.json()
-        bookId = body.book.id
     })
 
     it('既存bookIdで削除できる', async () => {

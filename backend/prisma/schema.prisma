@@ -10,24 +10,24 @@ generator client {
 }
 
 model User {
-  email     String  @id @unique
-  password  String
-  name      String
-  role      String
+  email     String  @id @unique @db.VarChar(255)
+  password  String  @db.VarChar(255)
+  name      String  @db.VarChar(255)
+  role      String  @db.VarChar(32)
   updatedAt DateTime @updatedAt
 
   books     Book[]   @relation("UserBooks")
 }
 
 model Book {
-  id           String   @id @default(uuid())
-  title        String
-  author       String
-  isbn         String?
-  location     String?
-  memo         String?
+  id           String   @id @default(uuid()) @db.Uuid
+  title        String   @db.VarChar(255)
+  author       String   @db.VarChar(255)
+  isbn         String?  @db.VarChar(32)
+  location     String?  @db.VarChar(255)
+  memo         String?  @db.Text
   purchasedAt  DateTime? @default("2000-01-01T00:00:00Z")
-  registeredBy String
+  registeredBy String   @db.VarChar(255)
   updatedAt    DateTime @updatedAt
 
   user         User     @relation("UserBooks", fields: [registeredBy], references: [email])
