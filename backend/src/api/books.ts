@@ -2,6 +2,8 @@ import { PrismaClient } from '@prisma/client'
 import { Hono } from 'hono'
 import { z, ZodError } from 'zod'
 import { jwtGuardian } from '../middleware/guardian.js'
+import { paramValidation } from '../middleware/validation.js'
+import { isValidDateFormat } from '../tools/validator.js'
 
 const prisma = new PrismaClient()
 const books = new Hono()
@@ -74,6 +76,59 @@ books.get('/', async (c) => {
     } catch (error) {
         if (error instanceof ZodError) {
             return c.json({ message: error.errors }, 400)
+        }
+        return c.json({ message: 'Internal Server Error' }, 500)
+    }
+})
+
+// POST /api/books
+const postBookSchema = z.object({
+    title: z.string().min(1, 'titleは必須です').max(255),
+    author: z.string().min(1, 'authorは必須です').max(255),
+    isbn: z.string().regex(/^[0-9\-]+$/, 'isbnは数字とハイフンのみ').max(32).optional().or(z.literal('').transform(() => undefined)),
+    location: z.string().max(255).optional(),
+    memo: z.string().optional(),
+    purchasedAt: z.string().optional(),
+})
+books.post('/', paramValidation(['title', 'author']), async (c) => {
+    try {
+        const body = await c.req.json()
+        // Zodバリデーション
+        const parsed = postBookSchema.parse(body)
+        // purchasedAtのバリデーション
+        let purchasedAt = parsed.purchasedAt || '2000-01-01'
+        if (purchasedAt && !isValidDateFormat(purchasedAt)) {
+            return c.json({ message: 'purchasedAtはYYYY-MM-DD形式で指定してください' }, 400)
+        }
+        // 日付の論理チェック
+        const dateObj = new Date(purchasedAt)
+        if (isNaN(dateObj.getTime())) {
+            return c.json({ message: 'purchasedAtが不正な日付です' }, 400)
+        }
+        // 登録者email
+        const user = c.get('user')
+        // 登録
+        const book = await prisma.book.create({
+            data: {
+                title: parsed.title,
+                author: parsed.author,
+                isbn: parsed.isbn || undefined,
+                location: parsed.location || undefined,
+                memo: parsed.memo || undefined,
+                purchasedAt: dateObj,
+                registeredBy: user.email,
+            }
+        })
+        // 日付をYYYY-MM-DDで返すよう整形
+        const bookJson = {
+            ...book,
+            purchasedAt: book.purchasedAt ? book.purchasedAt.toISOString().slice(0, 10) : undefined
+        }
+        return c.json({ book: bookJson })
+    } catch (error) {
+        if (error instanceof ZodError) {
+            const msg = error.errors.map(e => `${e.path[0]}: ${e.message}`).join(', ')
+            return c.json({ message: msg }, 400)
         }
         return c.json({ message: 'Internal Server Error' }, 500)
     }

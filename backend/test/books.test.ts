@@ -1,4 +1,5 @@
-import { beforeAll, describe, expect, it } from 'vitest'
+import { afterAll, beforeAll, describe, expect, it } from 'vitest'
+import prisma from '../prisma/client.js'
 import { app } from '../src/index.js'
 
 // テスト用ユーザー情報
@@ -233,5 +234,146 @@ describe('GET /api/books', () => {
         const body = await res.json()
         expect(body).toHaveProperty('message')
         expect(JSON.stringify(body.message)).toContain(msg)
+    })
+})
+
+describe('POST /api/books', () => {
+    let token: string
+    beforeAll(async () => {
+        token = await getToken()
+    })
+
+    // vitestの同じテストファイル内のテストは、シングルスレッドで上から順番（記述順）に実行される、とのこと
+    // なので生成された書籍データのidを保持しておいて、afterAllで削除することで、DB状態を維持します
+    const createdBookIds: string[] = [];
+
+    // POST /api/books用の共通リクエスト生成関数
+    function makePostBookRequest(token: string, body: any) {
+        return new Request('http://localhost/api/books', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(body)
+        })
+    }
+
+    // --- 正常系 ---
+    it('必須項目のみ指定で登録できる', async () => {
+        const req = makePostBookRequest(token, {
+            title: 'テストタイトル',
+            author: 'テスト著者'
+        })
+        const res = await app.fetch(req)
+        expect(res.status).toBe(200)
+        const body = await res.json()
+        expect(body.book).toHaveProperty('id')
+        expect(body.book.title).toBe('テストタイトル')
+        expect(body.book.author).toBe('テスト著者')
+        expect(body.book.purchasedAt).toBe('2000-01-01')
+        expect(body.book.registeredBy).toBe(validUser.email)
+        expect(body.book).toHaveProperty('updatedAt')
+        createdBookIds.push(body.book.id)
+    })
+
+    it('全項目指定で登録できる', async () => {
+        const req = makePostBookRequest(token, {
+            title: '完全指定タイトル',
+            author: '完全指定著者',
+            isbn: '978-1234567890',
+            location: '1F 棚',
+            memo: '改行\nテスト',
+            purchasedAt: '2024-05-27'
+        })
+        const res = await app.fetch(req)
+        expect(res.status).toBe(200)
+        const body = await res.json()
+        expect(body.book.title).toBe('完全指定タイトル')
+        expect(body.book.author).toBe('完全指定著者')
+        expect(body.book.isbn).toBe('978-1234567890')
+        expect(body.book.location).toBe('1F 棚')
+        expect(body.book.memo).toBe('改行\nテスト')
+        expect(body.book.purchasedAt).toBe('2024-05-27')
+        createdBookIds.push(body.book.id)
+    })
+
+    it('isbnに数字のみ/数字+ハイフンで登録できる', async () => {
+        const validIsbns = ['9781234567890', '978-1-2345-6789-0']
+        for (const isbn of validIsbns) {
+            const req = makePostBookRequest(token, {
+                title: 'isbnテスト',
+                author: '著者',
+                isbn
+            })
+            const res = await app.fetch(req)
+            expect(res.status).toBe(200)
+            const body = await res.json()
+            expect(body.book.isbn).toBe(isbn)
+            createdBookIds.push(body.book.id)
+        }
+    })
+
+    it('memoに改行や長文を指定して登録できる', async () => {
+        const longMemo = 'a'.repeat(1000) + '\n改行テスト'
+        const req = makePostBookRequest(token, {
+            title: 'memo長文',
+            author: '著者',
+            memo: longMemo
+        })
+        const res = await app.fetch(req)
+        expect(res.status).toBe(200)
+        const body = await res.json()
+        expect(body.book.memo).toBe(longMemo)
+        createdBookIds.push(body.book.id)
+    })
+
+    // --- 異常系 ---
+    const invalidCases = [
+        { name: 'title未指定', body: { author: 'a' }, msg: 'title' },
+        { name: 'author未指定', body: { title: 'a' }, msg: 'author' },
+        { name: 'titleが空文字', body: { title: '', author: 'a' }, msg: 'title' },
+        { name: 'authorが空文字', body: { title: 'a', author: '' }, msg: 'author' },
+        { name: 'titleが256文字以上', body: { title: 'a'.repeat(256), author: 'a' }, msg: 'title' },
+        { name: 'authorが256文字以上', body: { title: 'a', author: 'a'.repeat(256) }, msg: 'author' },
+        { name: 'isbnに数字・ハイフン以外が含まれる', body: { title: 'a', author: 'a', isbn: '978-abc-123' }, msg: 'isbn' },
+        { name: 'locationが256文字以上', body: { title: 'a', author: 'a', location: 'a'.repeat(256) }, msg: 'location' },
+        { name: 'purchasedAtがYYYY-MM-DD形式でない', body: { title: 'a', author: 'a', purchasedAt: '20240527' }, msg: 'purchasedAt' },
+        { name: 'purchasedAtが不正な日付', body: { title: 'a', author: 'a', purchasedAt: '2024-02-30' }, msg: 'purchasedAt' },
+    ]
+    it.each(invalidCases)('$name', async ({ body, msg }) => {
+        const req = makePostBookRequest(token, body)
+        const res = await app.fetch(req)
+        expect(res.status).toBe(400)
+        const resBody = await res.json()
+        expect(resBody).toHaveProperty('message')
+        expect(JSON.stringify(resBody.message)).toContain(msg)
+    })
+
+    // --- その他 ---
+    it('同じ内容で複数回登録した場合、別IDで登録される', async () => {
+        const bookData = { title: '重複テスト', author: '著者' }
+        const req1 = makePostBookRequest(token, bookData)
+        const req2 = makePostBookRequest(token, bookData)
+        const res1 = await app.fetch(req1)
+        const res2 = await app.fetch(req2)
+        expect(res1.status).toBe(200)
+        expect(res2.status).toBe(200)
+        const body1 = await res1.json()
+        const body2 = await res2.json()
+        expect(body1.book.id).not.toBe(body2.book.id)
+        createdBookIds.push(body1.book.id)
+        createdBookIds.push(body2.book.id)
+    })
+
+    // 増えてしまった登録データを削除
+    afterAll(async () => {
+        for (const id of createdBookIds) {
+            try {
+                await prisma.book.delete({ where: { id } })
+            } catch (e) {
+                // 既に削除済み等は無視
+            }
+        }
     })
 })
