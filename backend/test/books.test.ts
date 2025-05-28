@@ -624,3 +624,66 @@ describe('GET /api/books/:bookId', () => {
         expect(body).toHaveProperty('message')
     })
 })
+
+describe('DELETE /api/books/:bookId', () => {
+    let token: string
+    let bookId: string
+    beforeAll(async () => {
+        token = await getToken()
+        // 1冊登録してIDを保持
+        const req = new Request('http://localhost/api/books', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                title: '削除テスト',
+                author: '削除著者',
+                isbn: '999-9999999999',
+                location: '削除棚',
+                memo: '削除用',
+                purchasedAt: '2025-05-28'
+            })
+        })
+        const res = await app.fetch(req)
+        const body = await res.json()
+        bookId = body.book.id
+    })
+
+    it('既存bookIdで削除できる', async () => {
+        const req = new Request(`http://localhost/api/books/${bookId}`, {
+            method: 'DELETE',
+            headers: { 'Authorization': `Bearer ${token}` }
+        })
+        const res = await app.fetch(req)
+        expect(res.status).toBe(200)
+        const body = await res.json()
+        expect(body).toHaveProperty('message', 'deleted')
+        // DBから消えていること
+        const dbBook = await prisma.book.findUnique({ where: { id: bookId } })
+        expect(dbBook).toBeNull()
+    })
+
+    it('存在しないbookIdなら404', async () => {
+        const req = new Request('http://localhost/api/books/00000000-0000-0000-0000-000000000000', {
+            method: 'DELETE',
+            headers: { 'Authorization': `Bearer ${token}` }
+        })
+        const res = await app.fetch(req)
+        expect(res.status).toBe(404)
+        const body = await res.json()
+        expect(body).toHaveProperty('message')
+    })
+
+    it('bookIdがUUID形式でない場合は400', async () => {
+        const req = new Request('http://localhost/api/books/invalid-id', {
+            method: 'DELETE',
+            headers: { 'Authorization': `Bearer ${token}` }
+        })
+        const res = await app.fetch(req)
+        expect(res.status).toBe(400)
+        const body = await res.json()
+        expect(body).toHaveProperty('message')
+    })
+})

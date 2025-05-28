@@ -160,4 +160,18 @@ books.get('/:bookId', async (c) => {
     return c.json({ book: bookJson })
 })
 
+// DELETE /api/books/:bookId
+books.delete('/:bookId', async (c) => {
+    const { bookId } = c.req.param()
+    const uuidSchema = z.string().uuid({ message: 'bookIdはUUID形式で指定してください' })
+    uuidSchema.parse(bookId)
+    // 既存チェック
+    const existing = await prisma.book.findUnique({ where: { id: bookId } })
+    if (!existing) {
+        return c.json({ message: 'Not Found' }, 404)
+    }
+    await prisma.book.delete({ where: { id: bookId } })
+    return c.json({ message: 'deleted' })
+})
+
 export default books

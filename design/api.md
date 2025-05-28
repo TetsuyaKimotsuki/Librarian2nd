@@ -381,6 +381,45 @@ Authorization: Bearer xxxxx.yyyyy.zzzzz
 
 ---
 
+## DELETE /api/books/{bookId}
+
+#### 概要
+指定した書籍IDの書籍情報を削除する。
+
+#### リクエストヘッダ
+Authorization: Bearer [JWTトークン]
+
+#### パスパラメータ
+- bookId: string（UUID形式、必須）
+
+#### クエリパラメータ
+なし
+
+#### リクエストボディ
+なし
+
+#### リクエスト例
+```yaml
+DELETE /api/books/b1a2c3d4-...
+Authorization: Bearer xxxxx.yyyyy.zzzzz
+```
+
+#### レスポンス（成功時）
+```json
+{
+  "message": "deleted"
+}
+```
+
+#### レスポンス（失敗時）
+- 共通エラーハンドリング仕様を参照（[400](#400-bad-request), [401](#401-unauthorized)）
+- 指定したbookIdが存在しない場合は404 Not Foundを返却し、`message`フィールドで理由を返す
+
+#### 備考
+- 認証必須（JWTトークン）
+
+---
+
 ## 共通エラーハンドリング
 
 本API群では、以下のエラー応答を全APIで共通的に返す場合があります。
