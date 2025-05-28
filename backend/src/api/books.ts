@@ -1,5 +1,5 @@
 import { Hono } from 'hono'
-import { z, ZodError } from 'zod'
+import { z } from 'zod'
 import prisma from '../../prisma/client.js'
 import { jwtGuardian } from '../middleware/guardian.js'
 
@@ -29,52 +29,44 @@ const bookSearchSchema = z.object({
     }
 )
 books.get('/', async (c) => {
-    try {
-        const query = bookSearchSchema.parse(c.req.query())
-        const { keyword, purchased_from, purchased_to, page, per_page } = query
+    const query = bookSearchSchema.parse(c.req.query())
+    const { keyword, purchased_from, purchased_to, page, per_page } = query
 
-        const where: any = {
-            AND: [
-                keyword
-                    ? {
-                        OR: [
-                            { title: { contains: keyword } },
-                            { author: { contains: keyword } },
-                            { memo: { contains: keyword } },
-                            // registeredBy（email）部分一致
-                            { registeredBy: { contains: keyword } },
-                            // User.name部分一致（リレーション検索）
-                            { user: { name: { contains: keyword } } },
-                        ],
-                    }
-                    : undefined,
-                { purchasedAt: { gte: purchased_from } },
-                { purchasedAt: { lte: purchased_to } },
-            ].filter(Boolean),
-        }
-
-        const [booksList, total] = await Promise.all([
-            prisma.book.findMany({
-                where,
-                orderBy: { purchasedAt: 'desc' },
-                skip: (page - 1) * per_page,
-                take: per_page,
-            }),
-            prisma.book.count({ where }),
-        ])
-
-        return c.json({
-            books: booksList,
-            total,
-            page,
-            per_page,
-        })
-    } catch (error) {
-        if (error instanceof ZodError) {
-            return c.json({ message: error.errors }, 400)
-        }
-        return c.json({ message: 'Internal Server Error' }, 500)
+    const where: any = {
+        AND: [
+            keyword
+                ? {
+                    OR: [
+                        { title: { contains: keyword } },
+                        { author: { contains: keyword } },
+                        { memo: { contains: keyword } },
+                        // registeredBy（email）部分一致
+                        { registeredBy: { contains: keyword } },
+                        // User.name部分一致（リレーション検索）
+                        { user: { name: { contains: keyword } } },
+                    ],
+                }
+                : undefined,
+            { purchasedAt: { gte: purchased_from } },
+            { purchasedAt: { lte: purchased_to } },
+        ].filter(Boolean),
     }
+
+    const [booksList, total] = await Promise.all([
+        prisma.book.findMany({
+            where,
+            orderBy: { purchasedAt: 'desc' },
+            skip: (page - 1) * per_page,
+            take: per_page,
+        }),
+        prisma.book.count({ where }),
+    ])
+    return c.json({
+        books: booksList,
+        total,
+        page,
+        per_page,
+    })
 })
 
 // POST/PUT /api/books のリクエストスキーマが共通なので一本化
@@ -100,74 +92,53 @@ const pushBookSchema = z.object({
 
 // POST /api/books
 books.post('/', async (c) => {
-    try {
-        const body = await c.req.json()
-        const parsed = pushBookSchema.parse(body)
-        // 登録者email
-        const user = c.get('user')
-        // 登録
-        const book = await prisma.book.create({
-            data: {
-                title: parsed.title,
-                author: parsed.author,
-                isbn: parsed.isbn || undefined,
-                location: parsed.location || undefined,
-                memo: parsed.memo || undefined,
-                purchasedAt: new Date(parsed.purchasedAt),
-                registeredBy: user.email,
-            }
-        })
-        const bookJson = {
-            ...book,
-            // 日付をYYYY-MM-DDで返すよう整形
-            purchasedAt: book.purchasedAt!.toISOString().slice(0, 10)
+    const body = await c.req.json()
+    const parsed = pushBookSchema.parse(body)
+    const user = c.get('user')
+    const book = await prisma.book.create({
+        data: {
+            title: parsed.title,
+            author: parsed.author,
+            isbn: parsed.isbn || undefined,
+            location: parsed.location || undefined,
+            memo: parsed.memo || undefined,
+            purchasedAt: new Date(parsed.purchasedAt),
+            registeredBy: user.email,
         }
-        return c.json({ book: bookJson })
-    } catch (error) {
-        if (error instanceof ZodError) {
-            const msg = error.errors.map(e => `${e.path[0]}: ${e.message}`).join(', ')
-            return c.json({ message: msg }, 400)
-        }
-        return c.json({ message: 'Internal Server Error' }, 500)
+    })
+    const bookJson = {
+        ...book,
+        purchasedAt: book.purchasedAt!.toISOString().slice(0, 10)
     }
+    return c.json({ book: bookJson })
 })
 
 // PUT /api/books/:bookId
 books.put('/:bookId', async (c) => {
-    try {
-        const { bookId } = c.req.param()
-        const body = await c.req.json()
-        const parsed = pushBookSchema.parse(body)
-        // 既存レコード存在チェック
-        const existing = await prisma.book.findUnique({ where: { id: bookId } })
-        if (!existing) {
-            return c.json({ message: 'Not Found' }, 404)
-        }
-        const updated = await prisma.book.update({
-            where: { id: bookId },
-            data: {
-                title: parsed.title,
-                author: parsed.author,
-                isbn: parsed.isbn || undefined,
-                location: parsed.location || undefined,
-                memo: parsed.memo || undefined,
-                purchasedAt: new Date(parsed.purchasedAt),
-                // registeredByは変更不可
-                updatedAt: new Date(),
-            }
-        })
-        const bookJson = {
-            ...updated,
-            purchasedAt: updated.purchasedAt?.toISOString().slice(0, 10)
-        }
-        return c.json({ book: bookJson })
-    } catch (error) {
-        if (error instanceof ZodError) {
-            const msg = error.errors.map(e => `${e.path[0]}: ${e.message}`).join(', ')
-            return c.json({ message: msg }, 400)
-        }
-        return c.json({ message: 'Internal Server Error' }, 500)
+    const { bookId } = c.req.param()
+    const body = await c.req.json()
+    const parsed = pushBookSchema.parse(body)
+    const existing = await prisma.book.findUnique({ where: { id: bookId } })
+    if (!existing) {
+        return c.json({ message: 'Not Found' }, 404)
     }
+    const updated = await prisma.book.update({
+        where: { id: bookId },
+        data: {
+            title: parsed.title,
+            author: parsed.author,
+            isbn: parsed.isbn || undefined,
+            location: parsed.location || undefined,
+            memo: parsed.memo || undefined,
+            purchasedAt: new Date(parsed.purchasedAt),
+            updatedAt: new Date(),
+        }
+    })
+    const bookJson = {
+        ...updated,
+        purchasedAt: updated.purchasedAt?.toISOString().slice(0, 10)
+    }
+    return c.json({ book: bookJson })
 })
 
 export default books

@@ -348,6 +348,15 @@ Authorization: Bearer xxxxx.yyyyy.zzzzz
 ### 401 Unauthorized
 - 認証失敗、トークン不正・期限切れ等
 
+### 500 Internal Server Error
+- サーバー側の予期せぬエラー時
+- レスポンス例:
+```json
+{
+  "message": "Internal Server Error"
+}
+```
+
 ### 備考
 - 400エラーの詳細メッセージはAPIごとに異なる場合がありますが、原則として `message` フィールドで返却します。
 - これらの共通エラーは各API仕様の「失敗時」欄には省略する場合があります。

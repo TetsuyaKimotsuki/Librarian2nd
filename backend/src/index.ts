@@ -1,8 +1,10 @@
 import { Hono } from 'hono'
 import auth from './api/auth.js'
 import books from './api/books.js'
+import { errorHandler } from './api/errorHandler.js'
 
 export const app = new Hono()
+app.onError(errorHandler)
 
 app.get('/', (c) => {
   return c.text('Hello Node.js/Hono!')

@@ -1,7 +1,7 @@
 import * as bcrypt from 'bcryptjs'
 import { Hono } from 'hono'
 import jwt from 'jsonwebtoken'
-import { z, ZodError } from 'zod'
+import { z } from 'zod'
 import prisma from '../../prisma/client.js'
 import { JWT_SECRET, jwtGuardian } from "../middleware/guardian.js"
 
@@ -14,33 +14,25 @@ const loginSchema = z.object({
     password: z.string().min(1, 'passwordは必須です')
 })
 auth.post('/login', async (c) => {
-    try {
-        const body = await c.req.json()
-        const parsed = loginSchema.parse(body)
-        const { email, password } = parsed
-        const user = await prisma.user.findUnique({ where: { email } })
-        if (!user) {
-            return c.json({ message: '認証失敗' }, 401)
-        }
-        const valid = await bcrypt.compare(password, user.password)
-        if (!valid) {
-            return c.json({ message: '認証失敗' }, 401)
-        }
-        const token = jwt.sign({ email: user.email, name: user.name, role: user.role }, JWT_SECRET, { expiresIn: '1h' })
-        return c.json({
-            token,
-            user: {
-                email: user.email,
-                name: user.name
-            }
-        })
-    } catch (error) {
-        if (error instanceof ZodError) {
-            const msg = error.errors.map(e => `${e.path[0]}: ${e.message}`).join(', ')
-            return c.json({ message: msg }, 400)
-        }
-        return c.json({ message: 'Internal Server Error' }, 500)
+    const body = await c.req.json()
+    const parsed = loginSchema.parse(body)
+    const { email, password } = parsed
+    const user = await prisma.user.findUnique({ where: { email } })
+    if (!user) {
+        return c.json({ message: '認証失敗' }, 401)
     }
+    const valid = await bcrypt.compare(password, user.password)
+    if (!valid) {
+        return c.json({ message: '認証失敗' }, 401)
+    }
+    const token = jwt.sign({ email: user.email, name: user.name, role: user.role }, JWT_SECRET, { expiresIn: '1h' })
+    return c.json({
+        token,
+        user: {
+            email: user.email,
+            name: user.name
+        }
+    })
 })
 
 // GET /api/auth/me
