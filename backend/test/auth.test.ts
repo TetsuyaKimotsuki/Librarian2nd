@@ -37,7 +37,7 @@ describe('POST /api/auth/login', () => {
         const res = await app.fetch(req)
         expect(res.status).toBe(400)
         const resBody = await res.json()
-        expect(resBody.message).toMatch(/必須/)
+        expect(resBody.message).toMatch(/Required/)
     })
 
     it('存在しないユーザーの場合は401を返す', async () => {

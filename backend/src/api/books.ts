@@ -2,8 +2,6 @@ import { PrismaClient } from '@prisma/client'
 import { Hono } from 'hono'
 import { z, ZodError } from 'zod'
 import { jwtGuardian } from '../middleware/guardian.js'
-import { paramValidation } from '../middleware/validation.js'
-import { isValidDateFormat } from '../tools/validator.js'
 
 const prisma = new PrismaClient()
 const books = new Hono()
@@ -12,7 +10,6 @@ books.use('*', jwtGuardian)
 // GET /api/books/all
 books.get('/all', async (c) => {
     // 認証済みユーザー情報はc.get('user')で取得可能
-    // 書籍一覧取得
     const booksList = await prisma.book.findMany({
         orderBy: { purchasedAt: 'desc' },
     })
@@ -88,23 +85,23 @@ const postBookSchema = z.object({
     isbn: z.string().regex(/^[0-9\-]+$/, 'isbnは数字とハイフンのみ').max(32).optional().or(z.literal('').transform(() => undefined)),
     location: z.string().max(255).optional(),
     memo: z.string().optional(),
-    purchasedAt: z.string().optional(),
+    purchasedAt: z.string().optional().default('2000-01-01')
+    .refine(
+        (val) => !val || /^\d{4}-\d{2}-\d{2}$/.test(val),
+        { message: 'purchasedAtはYYYY-MM-DD形式で指定してください' }
+    )
+    .refine(
+        (val) => {
+            const date = new Date(val);
+            return !isNaN(date.getTime()) && date.toISOString().slice(0, 10) === val;
+        },
+        { message: 'purchasedAtが不正な日付です' }
+    ),
 })
-books.post('/', paramValidation(['title', 'author']), async (c) => {
+books.post('/', async (c) => {
     try {
         const body = await c.req.json()
-        // Zodバリデーション
         const parsed = postBookSchema.parse(body)
-        // purchasedAtのバリデーション
-        let purchasedAt = parsed.purchasedAt || '2000-01-01'
-        if (purchasedAt && !isValidDateFormat(purchasedAt)) {
-            return c.json({ message: 'purchasedAtはYYYY-MM-DD形式で指定してください' }, 400)
-        }
-        // 日付の論理チェック
-        const dateObj = new Date(purchasedAt)
-        if (isNaN(dateObj.getTime())) {
-            return c.json({ message: 'purchasedAtが不正な日付です' }, 400)
-        }
         // 登録者email
         const user = c.get('user')
         // 登録
@@ -115,14 +112,14 @@ books.post('/', paramValidation(['title', 'author']), async (c) => {
                 isbn: parsed.isbn || undefined,
                 location: parsed.location || undefined,
                 memo: parsed.memo || undefined,
-                purchasedAt: dateObj,
+                purchasedAt: new Date(parsed.purchasedAt),
                 registeredBy: user.email,
             }
         })
-        // 日付をYYYY-MM-DDで返すよう整形
         const bookJson = {
             ...book,
-            purchasedAt: book.purchasedAt ? book.purchasedAt.toISOString().slice(0, 10) : undefined
+            // 日付をYYYY-MM-DDで返すよう整形
+            purchasedAt: book.purchasedAt!.toISOString().slice(0, 10)
         }
         return c.json({ book: bookJson })
     } catch (error) {
