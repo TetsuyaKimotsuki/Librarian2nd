@@ -10,16 +10,39 @@ import {
   TableBody,
 } from "@mui/material";
 
-// テーブルのヘッダーとダミーデータ
 const headers: string[] = ["タイトル", "著者", "出版社", "ISBN", "購入日"];
-const rows: string[][] = [
-  ["リーダブルコード", "Dustin Boswell", "オライリー・ジャパン", "9784873115658", "2022-01-10"],
-  ["達人に学ぶDB設計 徹底指南書", "ミック", "翔泳社", "9784798142470", "2022-02-15"],
-];
 
-const ContentSection: React.FC = () => {
+// Book型をpropsで受け取るように修正
+interface Book {
+  id: string;
+  title: string;
+  author: string;
+  isbn?: string;
+  location?: string;
+  memo?: string;
+  purchasedAt?: string;
+  registeredBy?: string;
+  updatedAt?: string;
+}
+
+interface ContentSectionProps {
+  books: Book[];
+}
+
+const ContentSection: React.FC<ContentSectionProps> = ({ books }) => {
   return (
-    <Box sx={{ p: 4, width: "100%" }}>
+    <Box
+      sx={{
+        width: "100vw",
+        height: "100vh",
+        p: 0,
+        m: 0,
+        boxSizing: "border-box",
+        background: "#f8faf7",
+        display: "flex",
+        flexDirection: "column",
+      }}
+    >
       <TableContainer
         component={Paper}
         sx={{
@@ -32,16 +55,28 @@ const ContentSection: React.FC = () => {
           <TableHead>
             <TableRow>
               {headers.map((header, index) => (
-                <TableCell key={index}>{header}</TableCell>
+                <TableCell
+                  key={index}
+                  sx={{
+                    backgroundColor: "#9CD295",
+                    color: "#fff",
+                    fontWeight: "bold",
+                    fontSize: "1rem",
+                  }}
+                >
+                  {header}
+                </TableCell>
               ))}
             </TableRow>
           </TableHead>
           <TableBody>
-            {rows.map((row: string[], rowIndex: number) => (
-              <TableRow key={rowIndex}>
-                {row.map((cell: string, cellIndex: number) => (
-                  <TableCell key={cellIndex}>{cell}</TableCell>
-                ))}
+            {books.map((book) => (
+              <TableRow key={book.id}>
+                <TableCell>{book.title}</TableCell>
+                <TableCell>{book.author}</TableCell>
+                <TableCell>{book.memo || ""}</TableCell>
+                <TableCell>{book.isbn || ""}</TableCell>
+                <TableCell>{book.purchasedAt ? book.purchasedAt.slice(0, 10) : ""}</TableCell>
               </TableRow>
             ))}
           </TableBody>
