@@ -77,30 +77,32 @@ books.get('/', async (c) => {
     }
 })
 
-// POST /api/books
-const postBookSchema = z.object({
-    title: z.string().min(1, 'titleは必須です').max(255),
-    author: z.string().min(1, 'authorは必須です').max(255),
-    isbn: z.string().regex(/^[0-9\-]+$/, 'isbnは数字とハイフンのみ').max(32).optional().or(z.literal('').transform(() => undefined)),
-    location: z.string().max(255).optional(),
-    memo: z.string().optional(),
-    purchasedAt: z.string().optional().default('2000-01-01')
+// POST/PUT /api/books のリクエストスキーマが共通なので一本化
+const pushBookSchema = z.object({
+  title: z.string().min(1, 'titleは必須です').max(255),
+  author: z.string().min(1, 'authorは必須です').max(255),
+  isbn: z.string().regex(/^[0-9\-]+$/, 'isbnは数字とハイフンのみ').max(32).optional().or(z.literal('').transform(() => undefined)),
+  location: z.string().max(255).optional(),
+  memo: z.string().optional(),
+  purchasedAt: z.string().optional().default('2000-01-01')
     .refine(
-        (val) => !val || /^\d{4}-\d{2}-\d{2}$/.test(val),
-        { message: 'purchasedAtはYYYY-MM-DD形式で指定してください' }
+      (val) => !val || /^\d{4}-\d{2}-\d{2}$/.test(val),
+      { message: 'purchasedAtはYYYY-MM-DD形式で指定してください' }
     )
     .refine(
-        (val) => {
-            const date = new Date(val);
-            return !isNaN(date.getTime()) && date.toISOString().slice(0, 10) === val;
-        },
-        { message: 'purchasedAtが不正な日付です' }
+      (val) => {
+        const date = new Date(val);
+        return !isNaN(date.getTime()) && date.toISOString().slice(0, 10) === val;
+      },
+      { message: 'purchasedAtが不正な日付です' }
     ),
 })
+
+// POST /api/books
 books.post('/', async (c) => {
     try {
         const body = await c.req.json()
-        const parsed = postBookSchema.parse(body)
+        const parsed = pushBookSchema.parse(body)
         // 登録者email
         const user = c.get('user')
         // 登録
@@ -131,30 +133,11 @@ books.post('/', async (c) => {
 })
 
 // PUT /api/books/:bookId
-const putBookSchema = z.object({
-    title: z.string().min(1, 'titleは必須です').max(255),
-    author: z.string().min(1, 'authorは必須です').max(255),
-    isbn: z.string().regex(/^[0-9\-]+$/, 'isbnは数字とハイフンのみ').max(32).optional().or(z.literal('').transform(() => undefined)),
-    location: z.string().max(255).optional(),
-    memo: z.string().optional(),
-    purchasedAt: z.string().optional().default('2000-01-01')
-        .refine(
-            (val) => !val || /^\d{4}-\d{2}-\d{2}$/.test(val),
-            { message: 'purchasedAtはYYYY-MM-DD形式で指定してください' }
-        )
-        .refine(
-            (val) => {
-                const date = new Date(val);
-                return !isNaN(date.getTime()) && date.toISOString().slice(0, 10) === val;
-            },
-            { message: 'purchasedAtが不正な日付です' }
-        ),
-})
 books.put('/:bookId', async (c) => {
     try {
         const { bookId } = c.req.param()
         const body = await c.req.json()
-        const parsed = putBookSchema.parse(body)
+        const parsed = pushBookSchema.parse(body)
         // 既存レコード存在チェック
         const existing = await prisma.book.findUnique({ where: { id: bookId } })
         if (!existing) {
