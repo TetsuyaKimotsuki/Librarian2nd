@@ -1,9 +1,8 @@
-import { PrismaClient } from '@prisma/client'
 import { Hono } from 'hono'
 import { z, ZodError } from 'zod'
+import prisma from '../../prisma/client.js'
 import { jwtGuardian } from '../middleware/guardian.js'
 
-const prisma = new PrismaClient()
 const books = new Hono()
 books.use('*', jwtGuardian)
 

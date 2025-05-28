@@ -1,11 +1,10 @@
-import { PrismaClient } from '@prisma/client'
 import * as bcrypt from 'bcryptjs'
 import { Hono } from 'hono'
 import jwt from 'jsonwebtoken'
 import { z, ZodError } from 'zod'
+import prisma from '../../prisma/client.js'
 import { JWT_SECRET, jwtGuardian } from "../middleware/guardian.js"
 
-const prisma = new PrismaClient()
 const auth = new Hono()
 
 // POST /api/auth/login
