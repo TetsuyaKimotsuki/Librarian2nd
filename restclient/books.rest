@@ -30,22 +30,16 @@ Content-Type: application/json
 Authorization: Bearer {{token}}
 
 {
-  "title": "新しいテスト書籍",
-  "author": "テスト著者",
-  "location": "テスト棚",
-  "isbn": "978-1234567891",
-  "publisher": "テスト出版社",
-  "purchaseDate": "2024-01-01",
-  "price": 2000,
-  "notes": "テスト用の書籍です"
+  "title": "イシューからはじめよ",
+  "author": "安宅和人",
+  "isbn": "978-4478017212",
+  "location": "2F ビジネス書棚",
+  "memo": "思考法の名著",
+  "purchasedAt": "2021-03-15"
 }
 
-@bookId = {{createResponse.response.body.id}}
-
-### 書籍詳細取得 (IDを指定)
-# @name getBookByIdResponse
-GET {{url}}/books/{{bookId}}
-Authorization: Bearer {{token}}
+### 成功時の書籍IDを取り出します（なおこの ### の行がないと、上のJSONの末尾が正しく認識されず、APIで失敗します）
+@bookId = {{createResponse.response.body.book.id}}
 
 ### 書籍編集 (IDを指定)
 PUT {{url}}/books/{{bookId}}
@@ -53,15 +47,20 @@ Content-Type: application/json
 Authorization: Bearer {{token}}
 
 {
-  "title": "編集済みテスト書籍",
-  "author": "編集済み著者",
-  "location": "編集済み棚",
-  "isbn": "978-0987654321",
-  "publisher": "編集済み出版社",
-  "purchaseDate": "2024-02-01",
-  "price": 2500,
-  "notes": "編集済みのテスト書籍です"
+  "title": "イシューからはじめよ（改訂版）",
+  "author": "安宅和人",
+  "isbn": "978-4478017212",
+  "location": "2F ビジネス書棚",
+  "memo": "改訂版・思考法の名著",
+  "purchasedAt": "2024-05-01"
 }
+
+# 以下はまだAPIの開発待ちです
+
+### 書籍詳細取得 (IDを指定)
+# @name getBookByIdResponse
+GET {{url}}/books/{{bookId}}
+Authorization: Bearer {{token}}
 
 ### 書籍削除 (IDを指定)
 DELETE {{url}}/books/{{bookId}}

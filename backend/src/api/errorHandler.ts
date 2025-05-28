@@ -8,5 +8,6 @@ export function errorHandler(err: unknown, c: Context) {
         return c.json({ message: msg }, 400)
     }
     // 予期せぬエラーは500
+    console.error(`予期せぬエラー：${err}`)
     return c.json({ message: 'Internal Server Error' }, 500)
 }
