@@ -71,23 +71,23 @@ books.get('/', async (c) => {
 
 // POST/PUT /api/books のリクエストスキーマが共通なので一本化
 const pushBookSchema = z.object({
-  title: z.string().min(1, 'titleは必須です').max(255),
-  author: z.string().min(1, 'authorは必須です').max(255),
-  isbn: z.string().regex(/^[0-9\-]+$/, 'isbnは数字とハイフンのみ').max(32).optional().or(z.literal('').transform(() => undefined)),
-  location: z.string().max(255).optional(),
-  memo: z.string().optional(),
-  purchasedAt: z.string().optional().default('2000-01-01')
-    .refine(
-      (val) => !val || /^\d{4}-\d{2}-\d{2}$/.test(val),
-      { message: 'purchasedAtはYYYY-MM-DD形式で指定してください' }
-    )
-    .refine(
-      (val) => {
-        const date = new Date(val);
-        return !isNaN(date.getTime()) && date.toISOString().slice(0, 10) === val;
-      },
-      { message: 'purchasedAtが不正な日付です' }
-    ),
+    title: z.string().min(1, 'titleは必須です').max(255),
+    author: z.string().min(1, 'authorは必須です').max(255),
+    isbn: z.string().regex(/^[0-9\-]+$/, 'isbnは数字とハイフンのみ').max(32).optional().or(z.literal('').transform(() => undefined)),
+    location: z.string().max(255).optional(),
+    memo: z.string().optional(),
+    purchasedAt: z.string().optional().default('2000-01-01')
+        .refine(
+            (val) => !val || /^\d{4}-\d{2}-\d{2}$/.test(val),
+            { message: 'purchasedAtはYYYY-MM-DD形式で指定してください' }
+        )
+        .refine(
+            (val) => {
+                const date = new Date(val);
+                return !isNaN(date.getTime()) && date.toISOString().slice(0, 10) === val;
+            },
+            { message: 'purchasedAtが不正な日付です' }
+        ),
 })
 
 // POST /api/books
@@ -137,6 +137,25 @@ books.put('/:bookId', async (c) => {
     const bookJson = {
         ...updated,
         purchasedAt: updated.purchasedAt?.toISOString().slice(0, 10)
+    }
+    return c.json({ book: bookJson })
+})
+
+// GET /api/books/:bookId
+books.get('/:bookId', async (c) => {
+    // UUID形式バリデーション
+    const { bookId } = c.req.param()
+    const uuidSchema = z.string().uuid({ message: 'bookIdはUUID形式で指定してください' })
+    uuidSchema.parse(bookId)
+    // 取得
+    const book = await prisma.book.findUnique({ where: { id: bookId } })
+    if (!book) {
+        return c.json({ message: 'Not Found' }, 404)
+    }
+    // purchasedAtをYYYY-MM-DD形式で返す
+    const bookJson = {
+        ...book,
+        purchasedAt: book.purchasedAt?.toISOString().slice(0, 10)
     }
     return c.json({ book: bookJson })
 })

@@ -550,3 +550,77 @@ describe('PUT /api/books/{bookId}', () => {
         }
     })
 })
+
+describe('GET /api/books/:bookId', () => {
+    let token: string
+    let bookId: string
+    beforeAll(async () => {
+        token = await getToken()
+        // 1冊登録してIDを保持
+        const req = new Request('http://localhost/api/books', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                title: '詳細取得テスト',
+                author: 'テスト著者',
+                isbn: '123-4567890123',
+                location: '1F 棚',
+                memo: '詳細取得用',
+                purchasedAt: '2025-05-28'
+            })
+        })
+        const res = await app.fetch(req)
+        const body = await res.json()
+        bookId = body.book.id
+    })
+    afterAll(async () => {
+        // 登録した書籍を削除
+        try {
+            await prisma.book.delete({ where: { id: bookId } })
+        } catch (e) {}
+    })
+
+    it('既存bookIdで詳細情報が取得できる', async () => {
+        const req = new Request(`http://localhost/api/books/${bookId}`, {
+            method: 'GET',
+            headers: { 'Authorization': `Bearer ${token}` }
+        })
+        const res = await app.fetch(req)
+        expect(res.status).toBe(200)
+        const body = await res.json()
+        expect(body.book).toHaveProperty('id', bookId)
+        expect(body.book).toHaveProperty('title', '詳細取得テスト')
+        expect(body.book).toHaveProperty('author', 'テスト著者')
+        expect(body.book).toHaveProperty('isbn', '123-4567890123')
+        expect(body.book).toHaveProperty('location', '1F 棚')
+        expect(body.book).toHaveProperty('memo', '詳細取得用')
+        expect(body.book).toHaveProperty('purchasedAt', '2025-05-28')
+        expect(body.book).toHaveProperty('registeredBy', validUser.email)
+        expect(body.book).toHaveProperty('updatedAt')
+    })
+
+    it('存在しないbookIdなら404', async () => {
+        const req = new Request('http://localhost/api/books/00000000-0000-0000-0000-000000000000', {
+            method: 'GET',
+            headers: { 'Authorization': `Bearer ${token}` }
+        })
+        const res = await app.fetch(req)
+        expect(res.status).toBe(404)
+        const body = await res.json()
+        expect(body).toHaveProperty('message')
+    })
+
+    it('bookIdがUUID形式でない場合は400', async () => {
+        const req = new Request('http://localhost/api/books/invalid-id', {
+            method: 'GET',
+            headers: { 'Authorization': `Bearer ${token}` }
+        })
+        const res = await app.fetch(req)
+        expect(res.status).toBe(400)
+        const body = await res.json()
+        expect(body).toHaveProperty('message')
+    })
+})

@@ -55,12 +55,12 @@ Authorization: Bearer {{token}}
   "purchasedAt": "2024-05-01"
 }
 
-# 以下はまだAPIの開発待ちです
 
 ### 書籍詳細取得 (IDを指定)
 # @name getBookByIdResponse
 GET {{url}}/books/{{bookId}}
 Authorization: Bearer {{token}}
+
 
 ### 書籍削除 (IDを指定)
 DELETE {{url}}/books/{{bookId}}
