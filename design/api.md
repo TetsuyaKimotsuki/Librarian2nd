@@ -411,12 +411,16 @@ Authorization: Bearer xxxxx.yyyyy.zzzzz
 }
 ```
 
+#### 認可ロール
+admin
+
 #### レスポンス（失敗時）
-- 共通エラーハンドリング仕様を参照（[400](#400-bad-request), [401](#401-unauthorized)）
+- 共通エラーハンドリング仕様を参照（[400](#400-bad-request), [401](#401-unauthorized), [403](#403-forbidden)）
 - 指定したbookIdが存在しない場合は404 Not Foundを返却し、`message`フィールドで理由を返す
 
 #### 備考
 - 認証必須（JWTトークン）
+- 削除はadminロールのみ可能
 
 ---
 
@@ -435,6 +439,15 @@ Authorization: Bearer xxxxx.yyyyy.zzzzz
 
 ### 401 Unauthorized
 - 認証失敗、トークン不正・期限切れ等
+
+### 403 Forbidden
+- 認可ロール不足等によりアクセスが禁止されている場合
+- レスポンス例:
+```json
+{
+  "message": "この操作を行う権限がありません"
+}
+```
 
 ### 500 Internal Server Error
 - サーバー側の予期せぬエラー時

@@ -1,7 +1,7 @@
 import { Hono } from 'hono'
 import { z } from 'zod'
 import prisma from '../../prisma/client.js'
-import { jwtGuardian } from '../middleware/guardian.js'
+import { jwtGuardian, roleGuardian } from '../middleware/guardian.js'
 
 const books = new Hono()
 books.use('*', jwtGuardian)
@@ -164,7 +164,7 @@ books.get('/:bookId', async (c) => {
 })
 
 // DELETE /api/books/:bookId
-books.delete('/:bookId', async (c) => {
+books.delete('/:bookId', roleGuardian(['admin']), async (c) => {
     const { bookId } = c.req.param()
     const uuidSchema = z.string().uuid({ message: 'bookIdはUUID形式で指定してください' })
     uuidSchema.parse(bookId)

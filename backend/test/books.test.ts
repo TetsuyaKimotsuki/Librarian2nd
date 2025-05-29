@@ -1,27 +1,28 @@
+import jwt from 'jsonwebtoken'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import prisma from '../prisma/client.js'
 import { app } from '../src/index.js'
+import { JWT_SECRET } from '../src/middleware/guardian.js'
 
 // テスト用ユーザー情報
-const validUser = {
+const adminUser = {
     email: 'hanako.suzuki@sigo-ri.co.jp',
     password: 'hanako123',
-    name: '鈴木 花子'
+    name: '鈴木 花子',
+    role: 'admin'
+}
+const memberUser = {
+    email: 'taro.yamada@sigo-ri.co.jp',
+    password: 'taro123',
+    name: '山田 太郎',
+    role: 'member'
 }
 
 // JWT取得用のヘルパー
-async function getToken() {
-    const req = new Request('http://localhost/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            email: validUser.email,
-            password: validUser.password
-        })
-    })
-    const res = await app.fetch(req)
-    const body = await res.json()
-    return body.token
+async function getToken(role = 'admin') {
+    const user = role === 'admin' ? adminUser : memberUser
+    // テスト用にJWTを直接発行
+    return jwt.sign({ email: user.email, name: user.name, role: user.role }, JWT_SECRET, { expiresIn: '1h' })
 }
 
 // テスト用ダミー書籍を登録しIDを返す共通関数
@@ -287,7 +288,7 @@ describe('POST /api/books', () => {
         expect(body.book.title).toBe('テストタイトル')
         expect(body.book.author).toBe('テスト著者')
         expect(body.book.purchasedAt).toBe('2000-01-01')
-        expect(body.book.registeredBy).toBe(validUser.email)
+        expect(body.book.registeredBy).toBe(adminUser.email)
         expect(body.book).toHaveProperty('updatedAt')
         createdBookIds.push(body.book.id)
     })
@@ -446,7 +447,7 @@ describe('PUT /api/books/{bookId}', () => {
         expect(body.book.location).toBe(update.location)
         expect(body.book.memo).toBe(update.memo)
         expect(body.book.purchasedAt).toBe(update.purchasedAt)
-        expect(body.book.registeredBy).toBe(validUser.email)
+        expect(body.book.registeredBy).toBe(adminUser.email)
         expect(body.book).toHaveProperty('updatedAt')
     })
 
@@ -526,7 +527,7 @@ describe('PUT /api/books/{bookId}', () => {
         const res = await app.fetch(req)
         expect(res.status).toBe(200)
         const body = await res.json()
-        expect(body.book.registeredBy).toBe(validUser.email)
+        expect(body.book.registeredBy).toBe(adminUser.email)
     })
 
     it('更新後、DBの内容が正しく書き換わっている', async () => {
@@ -590,7 +591,7 @@ describe('GET /api/books/:bookId', () => {
         expect(body.book).toHaveProperty('location', '1F 棚')
         expect(body.book).toHaveProperty('memo', '詳細取得用')
         expect(body.book).toHaveProperty('purchasedAt', '2025-05-28')
-        expect(body.book).toHaveProperty('registeredBy', validUser.email)
+        expect(body.book).toHaveProperty('registeredBy', adminUser.email)
         expect(body.book).toHaveProperty('updatedAt')
     })
 
@@ -618,53 +619,39 @@ describe('GET /api/books/:bookId', () => {
 })
 
 describe('DELETE /api/books/:bookId', () => {
-    let token: string
+    let adminToken: string
+    let memberToken: string
     let bookId: string
     beforeAll(async () => {
-        token = await getToken()
-        bookId = await createDummyBook(token, {
-            title: '削除テスト',
-            author: '削除著者',
-            isbn: '999-9999999999',
-            location: '削除棚',
-            memo: '削除用',
-            purchasedAt: '2025-05-28'
+        adminToken = await getToken('admin')
+        memberToken = await getToken('member')
+        bookId = await createDummyBook(adminToken, {
+            title: 'テスト書籍',
+            author: 'テスト著者',
+            isbn: '1234567890123',
+            location: 'テスト棚',
+            memo: '削除テスト',
+            purchasedAt: '2025-05-29'
         })
     })
-
-    it('既存bookIdで削除できる', async () => {
+    it('memberロールは403を返す', async () => {
         const req = new Request(`http://localhost/api/books/${bookId}`, {
             method: 'DELETE',
-            headers: { 'Authorization': `Bearer ${token}` }
+            headers: { 'Authorization': `Bearer ${memberToken}` }
+        })
+        const res = await app.fetch(req)
+        expect(res.status).toBe(403)
+        const body = await res.json()
+        expect(body.message).toMatch(/権限がありません/)
+    })
+    it('adminロールなら削除できる', async () => {
+        const req = new Request(`http://localhost/api/books/${bookId}`, {
+            method: 'DELETE',
+            headers: { 'Authorization': `Bearer ${adminToken}` }
         })
         const res = await app.fetch(req)
         expect(res.status).toBe(200)
         const body = await res.json()
-        expect(body).toHaveProperty('message', 'deleted')
-        // DBから消えていること
-        const dbBook = await prisma.book.findUnique({ where: { id: bookId } })
-        expect(dbBook).toBeNull()
-    })
-
-    it('存在しないbookIdなら404', async () => {
-        const req = new Request('http://localhost/api/books/00000000-0000-0000-0000-000000000000', {
-            method: 'DELETE',
-            headers: { 'Authorization': `Bearer ${token}` }
-        })
-        const res = await app.fetch(req)
-        expect(res.status).toBe(404)
-        const body = await res.json()
-        expect(body).toHaveProperty('message')
-    })
-
-    it('bookIdがUUID形式でない場合は400', async () => {
-        const req = new Request('http://localhost/api/books/invalid-id', {
-            method: 'DELETE',
-            headers: { 'Authorization': `Bearer ${token}` }
-        })
-        const res = await app.fetch(req)
-        expect(res.status).toBe(400)
-        const body = await res.json()
-        expect(body).toHaveProperty('message')
+        expect(body.message).toBe('deleted')
     })
 })

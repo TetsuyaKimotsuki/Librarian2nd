@@ -39,3 +39,16 @@ declare module 'hono' {
         user: { email: string; name: string; role: string }
     }
 }
+
+// ロール認可用middleware
+// usage: roleGuardian(['admin'])
+// jwtGuardianでuser情報をセットした後に使用すること
+export function roleGuardian(roles: string[]): MiddlewareHandler {
+    return async (c, next) => {
+        const user = c.get('user')
+        if (!user || !roles.includes(user.role)) {
+            return c.json({ message: 'この操作を行う権限がありません' }, 403)
+        }
+        await next()
+    }
+}
