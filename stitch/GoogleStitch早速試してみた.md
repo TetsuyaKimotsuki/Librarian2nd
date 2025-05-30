@@ -204,6 +204,13 @@ per_page: 1ページあたりの表示件数（数値）
 <br><img src="md-images/20250530145304.png" width="480" height="400" alt="Stitch UI 書籍検索画面 ext dark" /><br>
 デザイン感の統一はやりやすそうです
 
+### モバイル向けに出力したらどうなる？
+
+やってみた。Experimental Modeの結果を貼ります。
+<br><img src="md-images/20250530152407.png" width="200" height="700" alt="Stitch UI 書籍検索画面 ext mobile" /><br>
+
+[stitch\html\search_mobile.html](./html/search_mobile.html) です。ちゃんとレスポンシブデザインになっています。
+
 ## まとめ
 
 - 使える
