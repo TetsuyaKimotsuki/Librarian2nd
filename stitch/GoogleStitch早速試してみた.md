@@ -29,7 +29,7 @@ chromeで公式 https://stitch.withgoogle.com/ を開いて開始
 あとWebアプリ想定なので「Web」を選択
 
 これでどうでしょうか・・40秒くらいで第一案が出てきました。
-<img src="md-images/20250530111634.png" width="640" height="400" alt="Stitch UI ログイン画面 第一案" />
+<br><img src="md-images/20250530111634.png" width="640" height="400" alt="Stitch UI ログイン画面 第一案" /><br>
 ここからあれこれ細かい注文を出してアジャストしていくのも出来そうです。
 
 ### 別パターンのプロンプト
@@ -64,19 +64,19 @@ chromeで公式 https://stitch.withgoogle.com/ を開いて開始
 ```
 
 時間はあまり変わらず・・
-<img src="md-images/20250530113855.png" width="640" height="400" alt="Stitch UI ログイン画面 第二案" />
+<br><img src="md-images/20250530113855.png" width="640" height="400" alt="Stitch UI ログイン画面 第二案" /><br>
 あんまり変わらないですね・・まあいいや第一案ベースでいきます
 
 ### 画面デザインのアジャスト
 
 ログイン画面のアジャストです。下記を編集プロンプトに投入します・・牧歌的ってなんやねん。
+```
 ・雰囲気を牧歌的に。
 ・各要素の縦中心をセンタリング。
 ・SingUpは不要なので削除。
 ・日本語で。
-
-<img src="md-images/20250530114720.png" width="640" height="400" alt="Stitch UI ログイン画面 ver1.1" />
-
+```
+<br><img src="md-images/20250530114720.png" width="640" height="400" alt="Stitch UI ログイン画面 ver1.1" /><br>
 どうも今一だな・・指示も通っていないし
 
 ### Mode/モデルの切り替え
@@ -87,28 +87,29 @@ chromeで公式 https://stitch.withgoogle.com/ を開いて開始
 ```
 部門で購入した書籍の情報を一元管理するWebアプリのログイン画面。emailとパスワードを入力するフォーム。日本語で表記。
 ```
-
 2分くらい待って出てきたのがこちら
-<img src="md-images/20250530115643.png" width="640" height="400" alt="Stitch UI ログイン画面 第３案" />
-きたこれwww
+<br><img src="md-images/20250530115643.png" width="640" height="400" alt="Stitch UI ログイン画面 第３案" /><br>
+きたこれwww<br>
 やればできる子だったw
 
 編集指示を段階的に入れていきます
+```
 １）forgotPasswordとSignUp、「一元管理します。」の末尾の「。」、ラベル「ログイン」はいずれも不要なので削除。
 ２）ラベル「ログイン」とログイン状態を保存のいずれも不要なので削除。 <- ラベル削除は反映されなかったので再度
 ３）copyrightを削除、画面タイトルラベルの「ログイン」を削除 <- ここでようやく反映
 ４）カラーセットをアースカラーに変更。背景色は薄いグラデーションで
-
+```
 色合いは微妙なんだけど、まあいいか・・
-<img src="md-images/20250530130947.png" width="640" height="400" alt="Stitch UI ログイン画面 最終版" />
+<br><img src="md-images/20250530130947.png" width="640" height="400" alt="Stitch UI ログイン画面 最終版" /><br>
 
-この辺のコントロールの具体例は下記記事が良さそうです。
+この辺のコントロールの具体例は下記記事が良さそうです。<br>
 https://zenn.dev/kimkiyong/articles/c374722c03f84e
 
 > この画面で「Code」をクリックすると、HTML/CSSコードが表示されます。適当なHTMLファイルを作成し、コピーしたコードを貼り付けて保存しましょう。
 
 [stitch\html\login.html](./html/login.html) です。
-これは・・そのまま使えそうですね。
+
+DLしてブラウザで開いてもらうと分かりますが、画像よりさらに見栄えがします。これは・・そのまま使えそうですね。
 
 > 試しに「Appearance」を「Light」から「Dark」に変更し、「Apply theme」をクリックしてみましょう。
 
@@ -184,13 +185,15 @@ per_page: 1ページあたりの表示件数（数値）
 ```
 
 2分ほどで出てきました・・丁寧にお願いしたからかな・・
-<img src="md-images/20250530134822.png" width="640" height="400" alt="Stitch UI 書籍検索画面 ver1.0" />
+<br><img src="md-images/20250530134822.png" width="640" height="400" alt="Stitch UI 書籍検索画面 ver1.0" /><br>
 結構完璧じゃないでしょうか・・
+
 [stitch\html\search.html](./html/search.html) です。
 
 デザインの調整は長くなるので止めておきます。
 
 ## まとめ
+
 ・使える
 ・デザインの調整はまだまだ手間がかかる（が今後も使い勝手は向上する見込み）
 ・開発プロセスとしては、このあとFigmaに落とし込んでのデザイン調整が想定されている感じですが、もういきなりReactプロジェクトに置いてCopilotに「Reactに変換して」で良い気もします・・
