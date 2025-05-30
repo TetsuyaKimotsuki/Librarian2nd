@@ -1,0 +1,80 @@
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <link crossorigin="" href="https://fonts.gstatic.com/" rel="preconnect" />
+    <link as="style"
+        href="https://fonts.googleapis.com/css2?display=swap&amp;family=Noto+Sans%3Awght%40400%3B500%3B700%3B900&amp;family=Work+Sans%3Awght%40400%3B500%3B700%3B900"
+        onload="this.rel='stylesheet'" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet" />
+    <title>書籍管理システム</title>
+    <link href="data:image/x-icon;base64," rel="icon" type="image/x-icon" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+      body {
+        @apply bg-gradient-to-br from-lime-50 via-green-100 to-stone-200;
+      }
+    }
+  </style>
+</head>
+
+<body class="">
+    <div class="relative flex size-full min-h-screen flex-col group/design-root overflow-x-hidden"
+        style='font-family: "Work Sans", "Noto Sans", sans-serif;'>
+        <div class="flex flex-col items-center justify-center min-h-screen px-4 py-12">
+            <header class="mb-10 text-center">
+                <div class="flex items-center justify-center gap-3 text-[#607D3B] mb-4">
+                    <svg class="w-10 h-10" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M4 19.5C4 18.6716 4.67157 18 5.5 18H18.5C19.3284 18 20 18.6716 20 19.5V21.5C20 22.3284 19.3284 23 18.5 23H5.5C4.67157 23 4 22.3284 4 21.5V19.5Z">
+                        </path>
+                        <path clip-rule="evenodd"
+                            d="M4 2C4 1.44772 4.44772 1 5 1H19C19.5523 1 20 1.44772 20 2V17H4V2ZM6 6C6 5.44772 6.44772 5 7 5H17C17.5523 5 18 5.44772 18 6V8C18 8.55228 17.5523 9 17 9H7C6.44772 9 6 8.55228 6 8V6ZM6 11C6 10.4477 6.44772 10 7 10H17C17.5523 10 18 10.4477 18 11V13C18 13.5523 17.5523 14 17 14H7C6.44772 14 6 13.5523 6 13V11Z"
+                            fill-rule="evenodd"></path>
+                    </svg>
+                    <h1 class="text-3xl font-bold tracking-tight text-stone-800">書籍管理システム</h1>
+                </div>
+                <p class="text-stone-600">部門で購入した書籍の情報を一元管理します</p>
+            </header>
+            <main class="w-full max-w-md bg-white/80 backdrop-blur-sm shadow-xl rounded-xl p-8 md:p-10">
+                <form class="space-y-6">
+                    <div>
+                        <label class="block text-sm font-medium text-stone-700 mb-1.5" for="email">メールアドレス</label>
+                        <div class="relative">
+                            <span
+                                class="material-icons-outlined absolute left-3 top-1/2 -translate-y-1/2 text-stone-400">
+                                email
+                            </span>
+                            <input autocomplete="email"
+                                class="form-input block w-full rounded-lg border-stone-300 bg-stone-50 py-3 pl-10 pr-3 text-stone-900 placeholder-stone-400 focus:border-[#607D3B] focus:ring-[#607D3B] sm:text-sm"
+                                id="email" name="email" placeholder="例: your@email.com" required="" type="email" />
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-stone-700 mb-1.5" for="password">パスワード</label>
+                        <div class="relative">
+                            <span
+                                class="material-icons-outlined absolute left-3 top-1/2 -translate-y-1/2 text-stone-400">
+                                lock
+                            </span>
+                            <input autocomplete="current-password"
+                                class="form-input block w-full rounded-lg border-stone-300 bg-stone-50 py-3 pl-10 pr-3 text-stone-900 placeholder-stone-400 focus:border-[#607D3B] focus:ring-[#607D3B] sm:text-sm"
+                                id="password" name="password" placeholder="パスワードを入力" required="" type="password" />
+                        </div>
+                    </div>
+                    <div class="pt-2">
+                        <button
+                            class="flex w-full justify-center items-center rounded-lg bg-[#607D3B] py-3 px-4 text-sm font-semibold text-white shadow-sm hover:bg-[#4F6631] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#607D3B] transition-colors duration-150 h-11"
+                            type="submit">
+                            <span class="material-icons-outlined mr-2">login</span>
+                            <span>ログイン</span>
+                        </button>
+                    </div>
+                </form>
+            </main>
+        </div>
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,267 @@
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <link crossorigin="" href="https://fonts.gstatic.com/" rel="preconnect" />
+    <link as="style"
+        href="https://fonts.googleapis.com/css2?display=swap&amp;family=Noto+Sans%3Awght%40400%3B500%3B700%3B900&amp;family=Public+Sans%3Awght%40400%3B500%3B700%3B900"
+        onload="this.rel='stylesheet'" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+    <title>Book Management</title>
+    <link href="data:image/x-icon;base64," rel="icon" type="image/x-icon" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+</head>
+
+<body class="relative flex size-full min-h-screen flex-col bg-slate-50 group/design-root overflow-x-hidden"
+    style='font-family: "Public Sans", "Noto Sans", sans-serif;'>
+    <div class="layout-container flex h-full grow flex-col">
+        <header
+            class="flex items-center justify-between whitespace-nowrap border-b border-solid border-b-slate-200 bg-white px-10 py-3 shadow-sm">
+            <div class="flex items-center gap-8">
+                <div class="flex items-center gap-3 text-slate-900">
+                    <span class="material-icons text-3xl text-[#0c7ff2]">menu_book</span>
+                    <h1 class="text-slate-900 text-xl font-bold leading-tight tracking-[-0.015em]">Book Management</h1>
+                </div>
+                <nav class="flex items-center gap-6">
+                    <a class="text-slate-700 hover:text-[#0c7ff2] text-sm font-medium leading-normal transition-colors"
+                        href="#">Home</a>
+                    <a class="text-[#0c7ff2] text-sm font-bold leading-normal" href="#">Books</a>
+                    <a class="text-slate-700 hover:text-[#0c7ff2] text-sm font-medium leading-normal transition-colors"
+                        href="#">Authors</a>
+                    <a class="text-slate-700 hover:text-[#0c7ff2] text-sm font-medium leading-normal transition-colors"
+                        href="#">Categories</a>
+                </nav>
+            </div>
+            <div class="flex items-center gap-4">
+                <button
+                    class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-[#0c7ff2] text-white text-sm font-bold leading-normal tracking-[0.015em] hover:bg-blue-600 transition-colors gap-2">
+                    <span class="material-icons text-lg">add_circle_outline</span>
+                    <span class="truncate">New Book</span>
+                </button>
+                <button
+                    class="flex items-center justify-center rounded-lg h-10 px-3 text-slate-700 hover:bg-slate-100 transition-colors gap-2">
+                    <span class="material-icons text-lg">logout</span>
+                    <span class="text-sm font-medium">Logout</span>
+                </button>
+                <div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 border border-slate-200"
+                    style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDSIE7Yu2CgenOxSbEv4sj0xtCPc1Hh7jBxENM1JhM63HywutQvF39lpovPurkeCVezzOm1P9GZo5s5kE2kdZ5pAswJ5mu5COPY72-EZGWP4m6cWN5JDhX12oFFn1mcQ01aTP1eZbJ9V3_ZE3TiEN6abafEgrhiR3lYcu1KqzFvKa7378X7e518cF6oaZt8vt560a3CHC9A_K613T7pkVgoqmGvMhe1mhe2f8tZYwEYxvHlac2WTE6a8xm5AJA0tlLioP89eiza3OCs");'>
+                </div>
+            </div>
+        </header>
+        <main class="flex-1 px-10 py-8">
+            <div class="mx-auto max-w-6xl">
+                <div class="mb-8 flex items-center justify-between">
+                    <div>
+                        <h2 class="text-slate-900 text-3xl font-bold leading-tight tracking-tight">Book List</h2>
+                        <p class="text-slate-600 text-sm font-normal leading-normal">Manage your department's book
+                            inventory.</p>
+                    </div>
+                </div>
+                <div class="bg-white shadow-sm rounded-lg p-6 mb-6">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="md:col-span-3">
+                            <label class="block text-slate-800 text-sm font-medium leading-normal pb-2"
+                                for="keywordSearch">Keyword Search</label>
+                            <div class="relative">
+                                <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                                    <span class="material-icons text-slate-400">search</span>
+                                </div>
+                                <input
+                                    class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-md text-slate-900 focus:outline-0 focus:ring-2 focus:ring-[#0c7ff2] border border-slate-300 bg-white h-11 placeholder:text-slate-400 px-3 pl-10 text-sm font-normal leading-normal focus:border-[#0c7ff2]"
+                                    id="keywordSearch" placeholder="Search by Title, Author, Notes, or Registrant Email"
+                                    type="text" />
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-slate-800 text-sm font-medium leading-normal pb-2"
+                                for="startDate">Purchase Start Date</label>
+                            <input
+                                class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-md text-slate-900 focus:outline-0 focus:ring-2 focus:ring-[#0c7ff2] border border-slate-300 bg-white h-11 placeholder:text-slate-400 p-3 text-sm font-normal leading-normal focus:border-[#0c7ff2]"
+                                id="startDate" placeholder="2000-01-01" type="date" value="2000-01-01" />
+                        </div>
+                        <div>
+                            <label class="block text-slate-800 text-sm font-medium leading-normal pb-2"
+                                for="endDate">Purchase End Date</label>
+                            <input
+                                class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-md text-slate-900 focus:outline-0 focus:ring-2 focus:ring-[#0c7ff2] border border-slate-300 bg-white h-11 placeholder:text-slate-400 p-3 text-sm font-normal leading-normal focus:border-[#0c7ff2]"
+                                id="endDate" type="date" />
+                        </div>
+                        <div class="flex items-end">
+                            <button
+                                class="flex w-full min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-md h-11 px-4 bg-slate-700 text-white text-sm font-bold leading-normal tracking-[0.015em] hover:bg-slate-600 transition-colors gap-2">
+                                <span class="material-icons text-lg">search</span>
+                                <span class="truncate">Search</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="overflow-x-auto rounded-lg border border-slate-200 bg-white shadow-sm">
+                    <table class="w-full min-w-[960px]">
+                        <thead class="bg-slate-50">
+                            <tr>
+                                <th
+                                    class="px-4 py-3 text-left text-slate-600 text-xs font-semibold uppercase tracking-wider">
+                                    Title</th>
+                                <th
+                                    class="px-4 py-3 text-left text-slate-600 text-xs font-semibold uppercase tracking-wider">
+                                    Author</th>
+                                <th
+                                    class="px-4 py-3 text-left text-slate-600 text-xs font-semibold uppercase tracking-wider">
+                                    ISBN</th>
+                                <th
+                                    class="px-4 py-3 text-left text-slate-600 text-xs font-semibold uppercase tracking-wider">
+                                    Storage Location</th>
+                                <th
+                                    class="px-4 py-3 text-left text-slate-600 text-xs font-semibold uppercase tracking-wider">
+                                    Notes/Memo</th>
+                                <th
+                                    class="px-4 py-3 text-left text-slate-600 text-xs font-semibold uppercase tracking-wider">
+                                    Purchase Date</th>
+                                <th
+                                    class="px-4 py-3 text-left text-slate-600 text-xs font-semibold uppercase tracking-wider">
+                                    Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-200">
+                            <tr class="hover:bg-slate-50 transition-colors">
+                                <td class="px-4 py-3 whitespace-nowrap text-slate-800 text-sm font-medium">The Great
+                                    Gatsby</td>
+                                <td class="px-4 py-3 whitespace-nowrap text-slate-600 text-sm">F. Scott Fitzgerald</td>
+                                <td class="px-4 py-3 whitespace-nowrap text-slate-600 text-sm">978-0743273565</td>
+                                <td class="px-4 py-3 whitespace-nowrap text-slate-600 text-sm">Shelf A2</td>
+                                <td class="px-4 py-3 whitespace-nowrap text-slate-600 text-sm">Classic novel</td>
+                                <td class="px-4 py-3 whitespace-nowrap text-slate-600 text-sm">2023-05-15</td>
+                                <td class="px-4 py-3 whitespace-nowrap text-sm space-x-2">
+                                    <button
+                                        class="text-[#0c7ff2] hover:text-blue-700 font-medium p-1 rounded-md hover:bg-blue-50 transition-colors">
+                                        <span class="material-icons text-lg align-middle">visibility</span>
+                                    </button>
+                                    <button
+                                        class="text-amber-600 hover:text-amber-800 font-medium p-1 rounded-md hover:bg-amber-50 transition-colors">
+                                        <span class="material-icons text-lg align-middle">edit</span>
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr class="hover:bg-slate-50 transition-colors">
+                                <td class="px-4 py-3 whitespace-nowrap text-slate-800 text-sm font-medium">To Kill a
+                                    Mockingbird</td>
+                                <td class="px-4 py-3 whitespace-nowrap text-slate-600 text-sm">Harper Lee</td>
+                                <td class="px-4 py-3 whitespace-nowrap text-slate-600 text-sm">978-0061120084</td>
+                                <td class="px-4 py-3 whitespace-nowrap text-slate-600 text-sm">Shelf B1</td>
+                                <td class="px-4 py-3 whitespace-nowrap text-slate-600 text-sm">Pulitzer Prize winner
+                                </td>
+                                <td class="px-4 py-3 whitespace-nowrap text-slate-600 text-sm">2022-11-20</td>
+                                <td class="px-4 py-3 whitespace-nowrap text-sm space-x-2">
+                                    <button
+                                        class="text-[#0c7ff2] hover:text-blue-700 font-medium p-1 rounded-md hover:bg-blue-50 transition-colors">
+                                        <span class="material-icons text-lg align-middle">visibility</span>
+                                    </button>
+                                    <button
+                                        class="text-amber-600 hover:text-amber-800 font-medium p-1 rounded-md hover:bg-amber-50 transition-colors">
+                                        <span class="material-icons text-lg align-middle">edit</span>
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr class="hover:bg-slate-50 transition-colors">
+                                <td class="px-4 py-3 whitespace-nowrap text-slate-800 text-sm font-medium">1984</td>
+                                <td class="px-4 py-3 whitespace-nowrap text-slate-600 text-sm">George Orwell</td>
+                                <td class="px-4 py-3 whitespace-nowrap text-slate-600 text-sm">978-0451524935</td>
+                                <td class="px-4 py-3 whitespace-nowrap text-slate-600 text-sm">Shelf C3</td>
+                                <td class="px-4 py-3 whitespace-nowrap text-slate-600 text-sm">Dystopian fiction</td>
+                                <td class="px-4 py-3 whitespace-nowrap text-slate-600 text-sm">2023-01-10</td>
+                                <td class="px-4 py-3 whitespace-nowrap text-sm space-x-2">
+                                    <button
+                                        class="text-[#0c7ff2] hover:text-blue-700 font-medium p-1 rounded-md hover:bg-blue-50 transition-colors">
+                                        <span class="material-icons text-lg align-middle">visibility</span>
+                                    </button>
+                                    <button
+                                        class="text-amber-600 hover:text-amber-800 font-medium p-1 rounded-md hover:bg-amber-50 transition-colors">
+                                        <span class="material-icons text-lg align-middle">edit</span>
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr class="hover:bg-slate-50 transition-colors">
+                                <td class="px-4 py-3 whitespace-nowrap text-slate-800 text-sm font-medium">Pride and
+                                    Prejudice</td>
+                                <td class="px-4 py-3 whitespace-nowrap text-slate-600 text-sm">Jane Austen</td>
+                                <td class="px-4 py-3 whitespace-nowrap text-slate-600 text-sm">978-0141439518</td>
+                                <td class="px-4 py-3 whitespace-nowrap text-slate-600 text-sm">Shelf A1</td>
+                                <td class="px-4 py-3 whitespace-nowrap text-slate-600 text-sm">Romantic novel</td>
+                                <td class="px-4 py-3 whitespace-nowrap text-slate-600 text-sm">2022-09-05</td>
+                                <td class="px-4 py-3 whitespace-nowrap text-sm space-x-2">
+                                    <button
+                                        class="text-[#0c7ff2] hover:text-blue-700 font-medium p-1 rounded-md hover:bg-blue-50 transition-colors">
+                                        <span class="material-icons text-lg align-middle">visibility</span>
+                                    </button>
+                                    <button
+                                        class="text-amber-600 hover:text-amber-800 font-medium p-1 rounded-md hover:bg-amber-50 transition-colors">
+                                        <span class="material-icons text-lg align-middle">edit</span>
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr class="hover:bg-slate-50 transition-colors">
+                                <td class="px-4 py-3 whitespace-nowrap text-slate-800 text-sm font-medium">The Catcher
+                                    in the Rye</td>
+                                <td class="px-4 py-3 whitespace-nowrap text-slate-600 text-sm">J.D. Salinger</td>
+                                <td class="px-4 py-3 whitespace-nowrap text-slate-600 text-sm">978-0316769488</td>
+                                <td class="px-4 py-3 whitespace-nowrap text-slate-600 text-sm">Shelf B2</td>
+                                <td class="px-4 py-3 whitespace-nowrap text-slate-600 text-sm">Coming-of-age story</td>
+                                <td class="px-4 py-3 whitespace-nowrap text-slate-600 text-sm">2023-03-22</td>
+                                <td class="px-4 py-3 whitespace-nowrap text-sm space-x-2">
+                                    <button
+                                        class="text-[#0c7ff2] hover:text-blue-700 font-medium p-1 rounded-md hover:bg-blue-50 transition-colors">
+                                        <span class="material-icons text-lg align-middle">visibility</span>
+                                    </button>
+                                    <button
+                                        class="text-amber-600 hover:text-amber-800 font-medium p-1 rounded-md hover:bg-amber-50 transition-colors">
+                                        <span class="material-icons text-lg align-middle">edit</span>
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="mt-6 flex items-center justify-between">
+                    <div class="text-sm text-slate-600">
+                        Showing <span class="font-medium">1</span> to <span class="font-medium">5</span> of <span
+                            class="font-medium">10</span> results
+                    </div>
+                    <nav class="flex items-center space-x-1">
+                        <a aria-label="Previous page"
+                            class="flex size-9 items-center justify-center rounded-md border border-slate-300 text-slate-600 hover:bg-slate-100 transition-colors"
+                            href="#">
+                            <span class="material-icons text-xl">chevron_left</span>
+                        </a>
+                        <a aria-current="page"
+                            class="flex size-9 items-center justify-center rounded-md border border-[#0c7ff2] bg-[#0c7ff2] text-white text-sm font-medium"
+                            href="#">1</a>
+                        <a class="flex size-9 items-center justify-center rounded-md border border-slate-300 text-slate-600 hover:bg-slate-100 transition-colors text-sm font-medium"
+                            href="#">2</a>
+                        <a class="flex size-9 items-center justify-center rounded-md border border-slate-300 text-slate-600 hover:bg-slate-100 transition-colors text-sm font-medium"
+                            href="#">3</a>
+                        <span class="text-slate-600">...</span>
+                        <a class="flex size-9 items-center justify-center rounded-md border border-slate-300 text-slate-600 hover:bg-slate-100 transition-colors text-sm font-medium"
+                            href="#">10</a>
+                        <a aria-label="Next page"
+                            class="flex size-9 items-center justify-center rounded-md border border-slate-300 text-slate-600 hover:bg-slate-100 transition-colors"
+                            href="#">
+                            <span class="material-icons text-xl">chevron_right</span>
+                        </a>
+                    </nav>
+                    <div class="flex items-center space-x-2 text-sm text-slate-600">
+                        <span>Items per page:</span>
+                        <select
+                            class="form-select rounded-md border-slate-300 h-9 py-1 text-sm focus:border-[#0c7ff2] focus:ring-1 focus:ring-[#0c7ff2]">
+                            <option>10</option>
+                            <option>25</option>
+                            <option>50</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+</body>
+
+</html>
