@@ -1,94 +1,129 @@
 import { Box, Button, Stack, TextField, Typography } from "@mui/material";
 import React, { useState } from "react";
+import SearchIcon from '@mui/icons-material/Search';
+import LibraryBooksIcon from '@mui/icons-material/LibraryBooks';
 
-const SidebarSection: React.FC = () => {
+// onSearch props型を追加
+interface SidebarSectionProps {
+  onSearch?: (params: { keyword?: string; purchased_from?: string; purchased_to?: string }) => void;
+}
+
+const SidebarSection: React.FC<SidebarSectionProps> = ({ onSearch }) => {
   const [searchParams, setSearchParams] = useState({
-    title: "",
-    author: "",
-    isbn: "",
     keyword: "",
+    purchased_from: "",
+    purchased_to: "",
   });
 
-  const handleChange =
-    (field: string) => (event: React.ChangeEvent<HTMLInputElement>) => {
-      setSearchParams({
-        ...searchParams,
-        [field]: event.target.value,
-      });
-    };
-
-  const handleSearch = () => {
-    // Search functionality would be implemented here
-    console.log("Search with params:", searchParams);
-  };
-
-  const handleClear = () => {
+  const handleChange = (field: string) => (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchParams({
-      title: "",
-      author: "",
-      isbn: "",
-      keyword: "",
+      ...searchParams,
+      [field]: event.target.value,
     });
   };
 
-  const searchFields = [
-    { id: "title", label: "タイトル" },
-    { id: "author", label: "著者" },
-    { id: "isbn", label: "ISBN" },
-    { id: "keyword", label: "キーワード" },
-  ];
+  const handleSearch = () => {
+    if (onSearch) {
+      onSearch({
+        keyword: searchParams.keyword,
+        purchased_from: searchParams.purchased_from,
+        purchased_to: searchParams.purchased_to,
+      });
+    } else {
+      console.log("Search with params:", searchParams);
+    }
+  };
+
+  const handleClear = () => {
+    setSearchParams({ keyword: "", purchased_from: "", purchased_to: "" });
+    if (onSearch) onSearch({});
+  };
 
   return (
-    <Box sx={{ width: 278, p: "5px", mt: 15.5, ml: 7.5 }}>
-      <Typography variant="h1" sx={{ fontSize: "24px", mb: 2 }}>
+    <Box sx={{ width: "21rem", p: "0.3125rem", mt: "2.75rem", ml: "2.5rem", background: "#f8faf7", borderRadius: "1rem", boxSizing: "border-box" }}>
+      <Typography variant="h1" sx={{ fontSize: "1.125rem", mb: "0.75rem", display: 'flex', alignItems: 'center' }}>
+        <SearchIcon sx={{ color: '#23651a', fontSize: '1.25rem', mr: 1 }} />
         書籍検索
       </Typography>
-
-      <Stack spacing={2} sx={{ width: "100%", mb: 2 }}>
-        {searchFields.map((field) => (
-          <Box key={field.id} sx={{ width: "100%", height: 65 }}>
-            <Box
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                height: 24,
-                pl: 0.5,
-                pt: 3,
-                pb: 1,
-              }}
-            >
-              <Typography sx={{ fontSize: "18px" }}>{field.label}</Typography>
-            </Box>
+      <Stack spacing={"0.75rem"} sx={{ width: "100%", mb: "1.5rem" }}>
+        <Box sx={{ width: "100%" }}>
+          <Typography sx={{ fontSize: "1rem", mb: "0.25rem", display: 'flex', alignItems: 'center' }}>
+            <SearchIcon sx={{ color: '#23651a', fontSize: 18, mr: 0.5 }} />キーワード
+          </Typography>
+          <TextField
+            fullWidth
+            variant="outlined"
+            value={searchParams.keyword}
+            onChange={handleChange("keyword")}
+            size="small"
+            sx={{
+              input: { backgroundColor: "#fff" },
+              "& .MuiOutlinedInput-root": {
+                "&.Mui-focused fieldset": {
+                  borderColor: "#23651a",
+                  boxShadow: "0 0 0 1px #23651a",
+                },
+              },
+            }}
+          />
+        </Box>
+        <Box sx={{ width: "100%" }}>
+          <Typography sx={{ fontSize: "1rem", mb: "0.25rem", display: 'flex', alignItems: 'center' }}>
+            <LibraryBooksIcon sx={{ color: '#23651a', fontSize: 18, mr: 0.5 }} />購入日
+          </Typography>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             <TextField
-              fullWidth
-              variant="outlined"
-              value={searchParams[field.id as keyof typeof searchParams]}
-              onChange={handleChange(field.id)}
-              InputProps={{
-                sx: {
-                  height: 26,
-                  mt: 1,
-                  ml: 0.5,
+              type="date"
+              value={searchParams.purchased_from}
+              onChange={handleChange("purchased_from")}
+              size="small"
+              sx={{
+                width: "48%",
+                input: { backgroundColor: "#fff" },
+                "& .MuiOutlinedInput-root": {
+                  "&.Mui-focused fieldset": {
+                    borderColor: "#23651a",
+                    boxShadow: "0 0 0 1px #23651a",
+                  },
                 },
               }}
+              InputLabelProps={{ shrink: true }}
+            />
+            <Typography sx={{ color: "#888", fontWeight: 600 }}>~</Typography>
+            <TextField
+              type="date"
+              value={searchParams.purchased_to}
+              onChange={handleChange("purchased_to")}
+              size="small"
+              sx={{
+                width: "48%",
+                input: { backgroundColor: "#fff" },
+                "& .MuiOutlinedInput-root": {
+                  "&.Mui-focused fieldset": {
+                    borderColor: "#23651a",
+                    boxShadow: "0 0 0 1px #23651a",
+                  },
+                },
+              }}
+              InputLabelProps={{ shrink: true }}
             />
           </Box>
-        ))}
+        </Box>
       </Stack>
-
-      <Stack direction="row" spacing={1} sx={{ mt: 2 }}>
+      <Stack direction="row" spacing={"0.5rem"} sx={{ mt: "1rem", justifyContent: "flex-end" }}>
         <Button
           variant="contained"
           onClick={handleSearch}
           sx={{
             bgcolor: "#23651a",
-            borderRadius: "5px",
+            borderRadius: "0.375rem",
             textTransform: "none",
-            width: "65px",
-            height: "34px",
-            "&:hover": {
-              bgcolor: "#1b4e14",
-            },
+            width: "4.0625rem",
+            height: "2.125rem",
+            minWidth: 0,
+            minHeight: 0,
+            p: 0,
+            '&:hover': { bgcolor: '#1b4e14' },
           }}
         >
           検索
@@ -100,10 +135,13 @@ const SidebarSection: React.FC = () => {
             color: "black",
             bgcolor: "white",
             borderColor: "#d6d6d6",
-            borderRadius: "5px",
+            borderRadius: "0.3125rem",
             textTransform: "none",
-            width: "65px",
-            height: "34px",
+            width: "4.0625rem",
+            height: "2.125rem",
+            minWidth: 0,
+            minHeight: 0,
+            p: 0,
           }}
         >
           クリア
