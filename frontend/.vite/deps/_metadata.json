@@ -2,48 +2,102 @@
   "hash": "841139db",
   "configHash": "bbe885aa",
   "lockfileHash": "3da8a68d",
-  "browserHash": "64a6bf90",
+  "browserHash": "6f83cbb4",
   "optimized": {
     "react/jsx-dev-runtime": {
       "src": "../../node_modules/react/jsx-dev-runtime.js",
       "file": "react_jsx-dev-runtime.js",
-      "fileHash": "c90e82e0",
+      "fileHash": "c7459cb1",
       "needsInterop": true
     },
     "react": {
       "src": "../../node_modules/react/index.js",
       "file": "react.js",
-      "fileHash": "4a593738",
+      "fileHash": "5ec0fd5b",
       "needsInterop": true
     },
     "react-dom/client": {
       "src": "../../node_modules/react-dom/client.js",
       "file": "react-dom_client.js",
-      "fileHash": "2e56d39d",
+      "fileHash": "f16abf95",
       "needsInterop": true
     },
     "react-router-dom": {
       "src": "../../node_modules/react-router-dom/dist/index.mjs",
       "file": "react-router-dom.js",
-      "fileHash": "5e2bde0b",
+      "fileHash": "a8359838",
       "needsInterop": false
     },
     "@mui/material": {
       "src": "../../node_modules/@mui/material/esm/index.js",
       "file": "@mui_material.js",
-      "fileHash": "f5db4047",
+      "fileHash": "41cb9e33",
       "needsInterop": false
     },
     "axios": {
       "src": "../../node_modules/axios/index.js",
       "file": "axios.js",
-      "fileHash": "6aa5e04f",
+      "fileHash": "0ad4931a",
+      "needsInterop": false
+    },
+    "@mui/icons-material/MenuBook": {
+      "src": "../../node_modules/@mui/icons-material/esm/MenuBook.js",
+      "file": "@mui_icons-material_MenuBook.js",
+      "fileHash": "82bd97b8",
+      "needsInterop": false
+    },
+    "@mui/icons-material/LibraryAdd": {
+      "src": "../../node_modules/@mui/icons-material/esm/LibraryAdd.js",
+      "file": "@mui_icons-material_LibraryAdd.js",
+      "fileHash": "c6616e8b",
+      "needsInterop": false
+    },
+    "@mui/icons-material/Person": {
+      "src": "../../node_modules/@mui/icons-material/esm/Person.js",
+      "file": "@mui_icons-material_Person.js",
+      "fileHash": "53c54206",
+      "needsInterop": false
+    },
+    "@mui/icons-material/Place": {
+      "src": "../../node_modules/@mui/icons-material/esm/Place.js",
+      "file": "@mui_icons-material_Place.js",
+      "fileHash": "723de0d2",
+      "needsInterop": false
+    },
+    "@mui/icons-material/Notes": {
+      "src": "../../node_modules/@mui/icons-material/esm/Notes.js",
+      "file": "@mui_icons-material_Notes.js",
+      "fileHash": "efaa84ab",
+      "needsInterop": false
+    },
+    "@mui/icons-material/Search": {
+      "src": "../../node_modules/@mui/icons-material/esm/Search.js",
+      "file": "@mui_icons-material_Search.js",
+      "fileHash": "ee0322d8",
+      "needsInterop": false
+    },
+    "@mui/icons-material/LibraryBooks": {
+      "src": "../../node_modules/@mui/icons-material/esm/LibraryBooks.js",
+      "file": "@mui_icons-material_LibraryBooks.js",
+      "fileHash": "a620e49b",
+      "needsInterop": false
+    },
+    "@mui/icons-material/Edit": {
+      "src": "../../node_modules/@mui/icons-material/esm/Edit.js",
+      "file": "@mui_icons-material_Edit.js",
+      "fileHash": "357957c7",
       "needsInterop": false
     }
   },
   "chunks": {
     "chunk-OAZAAUMI": {
       "file": "chunk-OAZAAUMI.js"
+    },
+    "chunk-C6WWHQR7": {
+      "file": "chunk-C6WWHQR7.js"
+    },
+    "chunk-VCNUQU2C": {
+      "file": "chunk-VCNUQU2C.js"
     },
     "chunk-6GAV2S6I": {
       "file": "chunk-6GAV2S6I.js"
