@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Box, Container, Typography, TextField, Button, Paper } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { saveToken } from "./utils/tokenStorage";
+import axios from "axios";
 
 const Login: React.FC = () => {
   const [credentials, setCredentials] = useState({
@@ -19,15 +20,27 @@ const Login: React.FC = () => {
     }));
   };
 
-  const handleSubmit = (event: React.FormEvent) => {
+  const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-    // ダミートークン保存＆画面遷移
+    setError("");
     if (!credentials.id || !credentials.password) {
       setError("メールアドレスとパスワードを入力してください");
       return;
     }
-    saveToken("dummy-jwt-token");
-    navigate("/books");
+    try {
+      const res = await axios.post("/api/auth/login", {
+        email: credentials.id,
+        password: credentials.password,
+      });
+      saveToken(res.data.token);
+      navigate("/books");
+    } catch (e) {
+      if (axios.isAxiosError(e)) {
+        setError("ログインに失敗しました。\nメールアドレスとパスワードを確認してください。");
+      } else {
+        alert("予期しないエラーが発生しました。");
+      }
+    }
   };
 
   return (
@@ -104,7 +117,7 @@ const Login: React.FC = () => {
               <Typography
                 color="error"
                 variant="body2"
-                sx={{ mt: 1, textAlign: "left" }} // 左寄せを追加
+                sx={{ mt: 1, textAlign: "left", whiteSpace: "pre-line" }}
               >
                 {error}
               </Typography>
