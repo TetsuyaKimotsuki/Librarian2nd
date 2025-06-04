@@ -132,16 +132,14 @@ const SidebarSection: React.FC<SidebarSectionProps> = ({ onSearch }) => {
           variant="outlined"
           onClick={handleClear}
           sx={{
-            color: "black",
-            bgcolor: "white",
-            borderColor: "#d6d6d6",
-            borderRadius: "0.3125rem",
+            borderColor: "#23651a",
+            color: "#23651a",
+            backgroundColor: "#fff",
+            fontWeight: 600,
+            borderRadius: "0.375rem",
             textTransform: "none",
-            width: "4.0625rem",
-            height: "2.125rem",
-            minWidth: 0,
-            minHeight: 0,
-            p: 0,
+            minWidth: "100px",
+            '&:hover': { backgroundColor: '#f5f5f5' },
           }}
         >
           クリア

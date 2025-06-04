@@ -13,7 +13,7 @@ interface DialogFrameProps {
     open: boolean;
     onClose: () => void;
     title: string;
-    message: string;
+    message: React.ReactNode;
 }
 
 const Frame: React.FC<DialogFrameProps> = ({
@@ -31,22 +31,21 @@ const Frame: React.FC<DialogFrameProps> = ({
             <Dialog
                 open={open}
                 onClose={onClose}
-                maxWidth="md"
-                BackdropProps={{
-                    sx: {
-                        backgroundColor: "rgba(0,0,0,0.45)",
-                        zIndex: 1200,
-                    },
-                }}
-                PaperProps={{
-                    sx: {
-                        width: 838,
-                        height: 442,
-                        borderRadius: "28px",
-                        boxShadow: "none",
+                maxWidth="sm"
+                sx={{
+                    '& .MuiDialog-paper': {
+                        width: 420,
+                        minHeight: 220,
+                        borderRadius: '18px',
+                        boxShadow: '0 2px 8px 0 rgba(0,0,0,0.08)',
                         m: 0,
-                        display: "flex",
-                        flexDirection: "column",
+                        display: 'flex',
+                        flexDirection: 'column',
+                        px: 0,
+                        py: 0,
+                    },
+                    '& .MuiBackdrop-root': {
+                        backgroundColor: 'rgba(0,0,0,0.45)',
                     },
                 }}
             >
@@ -54,50 +53,53 @@ const Frame: React.FC<DialogFrameProps> = ({
                     sx={{
                         bgcolor: "#64a35b",
                         color: "white",
-                        fontSize: 28,
+                        fontSize: "1.1rem",
+                        fontWeight: 600,
                         fontFamily: "Inter-Regular, Helvetica",
-                        height: 76,
-                        p: 2.5,
-                        pl: 3.5,
-                        borderTopLeftRadius: "28px",
-                        borderTopRightRadius: "28px",
+                        letterSpacing: "0.03em",
+                        p: 1.2,
+                        pl: 3,
+                        borderTopLeftRadius: "18px",
+                        borderTopRightRadius: "18px",
                     }}
                 >
                     {title}
                 </DialogTitle>
-                <DialogContent sx={{ p: 0, position: "relative", height: "100%" }}>
+                <DialogContent sx={{ p: 0, position: "relative", minHeight: 90, display: 'flex', alignItems: 'flex-start', justifyContent: 'flex-start' }}>
                     <Typography
                         sx={{
-                            fontSize: 18,
+                            fontSize: 17,
                             fontFamily: "Inter-Regular, Helvetica",
-                            position: "absolute",
-                            top: 23,
-                            left: 115,
-                            width: 608,
+                            px: '2.2rem',
+                            py: '1.2rem',
+                            textAlign: 'left',
                         }}
                     >
                         {message}
                     </Typography>
                 </DialogContent>
-                <DialogActions sx={{ justifyContent: "center", pb: 4, pt: 0, borderBottomLeftRadius: "28px", borderBottomRightRadius: "28px", background: "transparent" }}>
+                <DialogActions sx={{ justifyContent: "center", pb: 3, pt: 0, borderBottomLeftRadius: "18px", borderBottomRightRadius: "18px", background: "transparent", px: 0 }}>
                     <Button
                         variant="contained"
                         onClick={onClose}
                         sx={{
                             bgcolor: "#23651a",
                             border: "1px solid #6a6a6a",
-                            borderRadius: "5px",
-                            px: 8.5,
-                            py: 1.25,
+                            borderRadius: "0.375rem",
+                            px: 5,
+                            py: 1.1,
                             fontSize: 16,
                             fontFamily: "Inter-Regular, Helvetica",
                             textTransform: "none",
-                            "&:hover": {
+                            minWidth: "100px",
+                            height: "2.125rem",
+                            boxShadow: 'none',
+                            '&:hover': {
                                 bgcolor: "#1b5015",
                             },
                         }}
                     >
-                        OK
+                        閉じる
                     </Button>
                 </DialogActions>
             </Dialog>

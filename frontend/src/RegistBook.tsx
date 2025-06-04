@@ -47,7 +47,7 @@ const RegistOrEditBook: React.FC = () => {
     const fetchBook = async () => {
         try {
             const token = getToken();
-            const res = await axios.put(`/api/books/${id}`, {
+            const res = await axios.get(`/api/books/${id}`, {
                 headers: token ? { Authorization: `Bearer ${token}` } : {},
             });
             setForm({
@@ -325,10 +325,12 @@ const RegistOrEditBook: React.FC = () => {
                                     sx={{
                                         borderColor: "#23651a",
                                         color: "#23651a",
+                                        backgroundColor: "#fff",
                                         fontWeight: 600,
                                         borderRadius: "0.375rem",
                                         textTransform: "none",
                                         minWidth: "100px",
+                                        '&:hover': { backgroundColor: '#f5f5f5' },
                                     }}
                                 >
                                     キャンセル
