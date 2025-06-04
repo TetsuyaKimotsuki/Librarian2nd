@@ -3,6 +3,7 @@ import { Box, Container, Typography, TextField, Button, Paper } from "@mui/mater
 import { useNavigate } from "react-router-dom";
 import { saveToken } from "./utils/tokenStorage";
 import axios from "axios";
+import MenuBookIcon from '@mui/icons-material/MenuBook';
 
 const Login: React.FC = () => {
   const [credentials, setCredentials] = useState({
@@ -44,100 +45,135 @@ const Login: React.FC = () => {
   };
 
   return (
-    <Box
-      sx={{
-        position: "fixed",
-        inset: 0,
-        bgcolor: "#f5f5f5",
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "flex-start",
-        alignItems: "center",
-        zIndex: 0,
-      }}
-    >
-      {/* システム名は枠の外に、さらに下に表示（mt: 20, mb: 6） */}
-      <Typography
-        variant="h5"
-        align="center"
-        gutterBottom
-        sx={{ mt: 20, mb: 6 }}
+    <>
+      <Box
+        sx={{
+          width: "100vw",
+          height: "100vh",
+          bgcolor: "#f8faf7",
+          position: "relative", 
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          px: { xs: 1.5, sm: 3, md: 4 },
+          py: { xs: 1.5, sm: 2, md: 3 },
+          boxSizing: "border-box",
+          overflowX: "hidden",
+        }}
       >
-        部門購入書籍管理システム
-      </Typography>
-      <Container maxWidth="sm">
-        <Paper elevation={3} sx={{ p: 4, borderRadius: 2 }}>
-          <form onSubmit={handleSubmit}>
-            <Box sx={{ mb: 2 }}>
-              <Typography
-                variant="subtitle1"
-                sx={{ fontWeight: 500, textAlign: "left", mb: 0.5 }}
-              >
-                メールアドレス
-              </Typography>
-              <TextField
-                name="id"
-                value={credentials.id}
-                onChange={handleChange}
+        <MenuBookIcon
+          sx={{
+            position: "absolute",
+            top: "45%",
+            left: "20%",
+            fontSize: { xs: 640, sm: 840, md: 1120 }, 
+            color: "#b7e2c4",
+            opacity: 0.5,
+            transform: "translate(-50%, -50%)",
+            zIndex: 0,
+            pointerEvents: "none",
+            userSelect: "none",
+          }}
+        />
+        <Typography
+          variant="h5"
+          align="center"
+          gutterBottom
+          sx={{ mt: 0, mb: 6, zIndex: 1, position: "relative", fontWeight: 700 }}
+        >
+          部門購入書籍管理システム
+        </Typography>
+        <Container maxWidth="sm" sx={{ position: "relative", zIndex: 1 }}>
+          <Paper elevation={3} sx={{ p: 4, borderRadius: 2 }}>
+            <form onSubmit={handleSubmit}>
+              {error && (
+                <Typography
+                  color="error"
+                  variant="body2"
+                  sx={{ mb: 2, textAlign: "left", whiteSpace: "pre-line" }}
+                >
+                  {error}
+                </Typography>
+              )}
+              <Box sx={{ mb: 2 }}>
+                <Typography
+                  variant="subtitle1"
+                  sx={{ fontWeight: 500, textAlign: "left", mb: 0.5 }}
+                >
+                  メールアドレス
+                </Typography>
+                <TextField
+                  name="id"
+                  value={credentials.id}
+                  onChange={handleChange}
+                  fullWidth
+                  margin="dense"
+                  autoComplete="username"
+                  variant="outlined"
+                  size="small"
+                  label=""
+                  placeholder=""
+                  error={!!error}
+                  sx={{
+                    mt: 0,
+                    '& .MuiOutlinedInput-root': {
+                      '&.Mui-focused fieldset': {
+                        borderColor: '#23651a',
+                        boxShadow: '0 0 0 1px #23651a',
+                      },
+                    },
+                  }}
+                />
+              </Box>
+              <Box sx={{ mb: 2 }}>
+                <Typography
+                  variant="subtitle1"
+                  sx={{ fontWeight: 500, textAlign: "left", mb: 0.5 }}
+                >
+                  パスワード
+                </Typography>
+                <TextField
+                  name="password"
+                  type="password"
+                  value={credentials.password}
+                  onChange={handleChange}
+                  fullWidth
+                  margin="dense"
+                  autoComplete="current-password"
+                  variant="outlined"
+                  size="small"
+                  label=""
+                  placeholder=""
+                  error={!!error}
+                  sx={{
+                    mt: 0,
+                    '& .MuiOutlinedInput-root': {
+                      '&.Mui-focused fieldset': {
+                        borderColor: '#23651a',
+                        boxShadow: '0 0 0 1px #23651a',
+                      },
+                    },
+                  }}
+                />
+              </Box>
+              <Button
+                type="submit"
+                variant="contained"
                 fullWidth
-                margin="dense"
-                autoComplete="username"
-                variant="outlined"
-                size="small"
-                label=""
-                placeholder=""
-                error={!!error}
-                sx={{ mt: 0 }}
-              />
-            </Box>
-            <Box sx={{ mb: 2 }}>
-              <Typography
-                variant="subtitle1"
-                sx={{ fontWeight: 500, textAlign: "left", mb: 0.5 }}
+                sx={{
+                  mt: 2,
+                  backgroundColor: "#23651a",
+                  "&:hover": { backgroundColor: "#1b4e14" },
+                }}
               >
-                パスワード
-              </Typography>
-              <TextField
-                name="password"
-                type="password"
-                value={credentials.password}
-                onChange={handleChange}
-                fullWidth
-                margin="dense"
-                autoComplete="current-password"
-                variant="outlined"
-                size="small"
-                label=""
-                placeholder=""
-                error={!!error}
-                sx={{ mt: 0 }}
-              />
-            </Box>
-            {error && (
-              <Typography
-                color="error"
-                variant="body2"
-                sx={{ mt: 1, textAlign: "left", whiteSpace: "pre-line" }}
-              >
-                {error}
-              </Typography>
-            )}
-            <Button
-              type="submit"
-              variant="contained"
-              fullWidth
-              sx={{
-                mt: 2,
-                backgroundColor: "#23651a",
-                "&:hover": { backgroundColor: "#1b4e14" },
-              }}
-            >
-              ログイン
-            </Button>
-          </form>
-        </Paper>
-      </Container>
-    </Box>
+                ログイン
+              </Button>
+            </form>
+          </Paper>
+        </Container>
+      </Box>
+    </>
   );
 };
 
